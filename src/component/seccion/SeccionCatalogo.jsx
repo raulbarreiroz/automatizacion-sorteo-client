@@ -25,6 +25,7 @@ const SeccionCatalogo = (props) => {
   useEffect(() => {
     console.log('getting catalogos: ')
     const getCatalogos = async () => {
+      console.log(`${process.env.REACT_APP_SERVERURL}/catalogos`)
       const response = await fetch(`${process.env.REACT_APP_SERVERURL}/catalogos`)
       const catalogos = await response.json()
       console.log(catalogos)
