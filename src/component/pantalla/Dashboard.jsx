@@ -23,6 +23,7 @@ import SeccionProfesores from '../seccion/SeccionProfesores'
 import SeccionRegalos from '../seccion/SeccionRegalos'
 import SeccionSorteos from '../seccion/SeccionSorteos'
 import SeccionUsuarios from '../seccion/SeccionUsuarios'
+import SeccionCatalogo from '../seccion/SeccionCatalogo';
 
 function Copyright(props) {
   return (
@@ -131,7 +132,8 @@ export default function Dashboard(props) {
 
   useEffect(() => {    
     setSeccion(props?.seccion)
-  }, [location])
+    console.log('testing')
+  }, [location, props?.seccion])
   
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -165,7 +167,7 @@ export default function Dashboard(props) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Plataforma de Automatización de Sorteo de Regalos
+              Plataforma de Automatización de Sorteo de Regalos / {seccion?.substring(7)}
             </Typography>            
           </Toolbar>
         </AppBar>
@@ -228,7 +230,8 @@ export default function Dashboard(props) {
               }
               {seccion === 'SeccionRegalos' && <SeccionRegalos />}
               {seccion === 'SeccionUsuarios' && <SeccionUsuarios />}
-              {seccion === 'SeccionSorteos' && <SeccionSorteos />}                                    
+              {seccion === 'SeccionSorteos' && <SeccionSorteos />}
+              {seccion === 'SeccionCatalogo' && <SeccionCatalogo />}    
             </Container> 
             <Grid 
               style={{ 

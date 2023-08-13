@@ -2,15 +2,9 @@ import * as React from 'react';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import AppsIcon from '@mui/icons-material/Apps';
 import CasinoIcon from '@mui/icons-material/Casino';
+import StorageIcon from '@mui/icons-material/Storage';
 import SchoolIcon from '@mui/icons-material/School';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -75,6 +69,14 @@ export const secondaryListItems = (
           <AssignmentIndIcon />
         </ListItemIcon>
         <ListItemText primary="Usuarios" />
+      </ListItemButton>
+    </NavLink>
+    <NavLink to='/dashboard/catalogo' style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <StorageIcon />
+        </ListItemIcon>
+        <ListItemText primary="Catalogo" />
       </ListItemButton>
     </NavLink>
   </React.Fragment>

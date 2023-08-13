@@ -71,6 +71,11 @@ const App = () => {
             element={<Dashboard seccion="SeccionSorteos" />}
             path="dashboard/sorteos"
           ></Route>
+          <Route
+            index
+            element={<Dashboard seccion="SeccionCatalogo" />}
+            path="dashboard/catalogo"
+          ></Route>
           <Route path="*" element={<PaginaNoEncontrada />} />
           <Route
             path="dashboard/*"
