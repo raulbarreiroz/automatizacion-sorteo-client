@@ -13,6 +13,10 @@ import TableRow from '@mui/material/TableRow';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DialogUpdateProfesor from '../dialog/DialogUpdateProfesor';
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import InputLabel from '@mui/material/InputLabel'
+import TextField from '@mui/material/TextField';
 
 const SeccionCatalogo = (props) => {
   const gridBotones = useRef(undefined)
@@ -21,34 +25,47 @@ const SeccionCatalogo = (props) => {
   const [hoveredCell, setHoveredCell] = useState(undefined)
   const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] = useState(false)
   const [dataProfesor, setDataProfesor] = useState(undefined)
-  
+  const [catalogos, setCatalogos] = useState(undefined)
+  const [cabeceras, setCabeceras] = useState(undefined)
+  const [detalles, setDetalles] = useState(undefined)
+  const [cabeceraSeleccionada, setcabeceraSeleccionada] = useState(-1)
+
   useEffect(() => {
-    console.log('getting catalogos: ')
     const getCatalogos = async () => {
-      console.log(`${process.env.REACT_APP_SERVERURL}/catalogos`)
-      const response = await fetch(`${process.env.REACT_APP_SERVERURL}/catalogos`)
-      const catalogos = await response.json()
-      console.log(catalogos)
+      try {
+        console.log(`${process.env.REACT_APP_SERVERURL}/catalogos`)
+        const response = await fetch(`${process.env.REACT_APP_SERVERURL}/catalogos`)
+        const catalogos = await response.json()
+        setCatalogos(catalogos || [])
+        setCabeceras(catalogos?.map((cabecera) => ({
+          nombre: cabecera?.nombre,
+          id: cabecera?.id
+        })))
+        setcabeceraSeleccionada(catalogos[0]?.id)
+      } catch(err) {
+        console.log(err)
+        setCatalogos([])
+        setCabeceras(-1)
+        setcabeceraSeleccionada([])
+      }
     }
 
     getCatalogos()
   }, [])
 
-  function createProfesor(cedula, nombreCompleto, facultad, creadoPor) {
-    return { cedula, nombreCompleto, facultad, creadoPor, today };
-  }
+  useEffect(() => {
+    const catalogosFiltrados = catalogos?.filter(catalogo => catalogo?.id === cabeceraSeleccionada)
+    if (catalogosFiltrados?.length) {
+      setDetalles(catalogosFiltrados[0]?.detalles)
+    } else {
+      setDetalles([])
+    }
+  }, [cabeceraSeleccionada, catalogos])
 
-  const rows = [
-    createProfesor('0000000000', 'profesor0', 'facultad1', 'admin'),
-    createProfesor('0000000001', 'profesor1', 'facultad1', 'admin'),
-    createProfesor('0000000002', 'profesor2', 'facultad2', 'admin'),
-    createProfesor('0000000003', 'profesor3', 'facultad2', 'admin'),
-    createProfesor('0000000004', 'profesor4', 'facultad3', 'admin'),
-    createProfesor('0000000005', 'profesor5', 'facultad1', 'admin'),
-    createProfesor('0000000006', 'profesor6', 'facultad1', 'admin'),
-    createProfesor('0000000007', 'profesor7', 'facultad1', 'admin'),
-    createProfesor('0000000008', 'profesor8', 'facultad2', 'admin'),
-  ];
+  useEffect(() => {
+    console.log('detalles')
+    console.log(detalles)
+  }, [detalles])
 
   return (     
     <>
@@ -59,7 +76,32 @@ const SeccionCatalogo = (props) => {
           padding: '2.5vh 1.5vw'
         }}
       >
-        <Grid ref={gridBotones}>
+        <Grid ref={gridBotones} container
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center'
+          }}
+        >                                
+          <Select    
+            sx={{
+              p: 0,
+              m: 0,
+              mb: 2,
+              ml: -3,
+              transform: 'scale(0.9)',
+              width: '40%'
+            }}
+            variant="outlined" size='small'              
+            id="facultad-select"                                               
+            value={cabeceraSeleccionada}
+          >
+            {cabeceras?.map((cabecera) => {
+              return (
+                <MenuItem key={cabecera?.id} value={cabecera?.id}>{cabecera?.nombre}</MenuItem>
+              )
+            })}             
+          </Select>                                            
           <Button variant="outlined" 
             startIcon={<SchoolIcon />} endIcon={<AddIcon />}
             sx={{mb: 2,}}
@@ -68,10 +110,9 @@ const SeccionCatalogo = (props) => {
               setModoDialogUpdateProfesor('ADD')
               setDataProfesor(undefined)
             }}
-          
->
+          >
             Catalogo
-          </Button>                                                                    
+          </Button>                                                             
         </Grid>
         <Grid 
           item xs={12}
@@ -99,7 +140,7 @@ const SeccionCatalogo = (props) => {
                         borderStartStartRadius: '5px'                      
                       }}
                     >
-                      Cédula
+                      Nombre
                     </TableCell>
                     <TableCell
                     style={{
@@ -107,7 +148,7 @@ const SeccionCatalogo = (props) => {
                         color: 'white'                      
                       }}  
                     >
-                      Nombre completo
+                      Descripcion
                     </TableCell>
                     <TableCell
                       style={{
@@ -115,7 +156,7 @@ const SeccionCatalogo = (props) => {
                         color: 'white'                      
                       }}  
                     >
-                      Facultad
+                      Creado por
                     </TableCell>
                     <TableCell
                     style={{
@@ -123,16 +164,8 @@ const SeccionCatalogo = (props) => {
                         color: 'white'                      
                       }}  
                     >
-                      CreadoPor
-                    </TableCell>
-                    <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}  
-                    >
-                      FechaCreacion
-                    </TableCell>
+                      Fecha de Creacion
+                    </TableCell>                  
                     <TableCell
                     style={{
                         backgroundColor: 'rgb(153, 0, 0)',
@@ -155,7 +188,7 @@ const SeccionCatalogo = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, i) => (
+                  {detalles?.length && detalles.map((row, i) => (
                     <TableRow
                       key={row.cedula}
                       sx={{ 
@@ -174,12 +207,11 @@ const SeccionCatalogo = (props) => {
                       }}
                     >
                       <TableCell component="th" scope="row">
-                        {row.cedula}
+                        {row.nombre}
                       </TableCell>
-                      <TableCell>{row.nombreCompleto}</TableCell>
-                      <TableCell>{row.facultad}</TableCell>
-                      <TableCell>{row.creadoPor}</TableCell>
-                      <TableCell>{row.today}</TableCell>
+                      <TableCell>{row.descripcion}</TableCell>
+                      <TableCell>{row.creado_por}</TableCell>
+                      <TableCell>{row.fecha_creacion}</TableCell>                      
                       <TableCell>
                         <EditIcon 
                           style={{
@@ -218,4 +250,10 @@ const SeccionCatalogo = (props) => {
   )
 }
 
-export  default SeccionCatalogo
+export default SeccionCatalogo
+
+
+/**
+ * TODO:
+ * arreglar select y boton
+ */
