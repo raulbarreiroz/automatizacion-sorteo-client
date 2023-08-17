@@ -20,7 +20,7 @@ import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import EditIcon from "@mui/icons-material/Edit";
 import MenuItem from "@mui/material/MenuItem";
 
-const DialogEditarRegistro = (props) => {
+const DialogEditarRegistroProfesor = (props) => {
   const [mensajesSeleccionados, setMensajesSeleccionado] = useState(undefined);
   const [campo, setCampo] = useState("");
   const [cedulasRepetidasEnArchivo, setCedulasRepetidasEnArchivo] =
@@ -299,4 +299,4 @@ const DialogEditarRegistro = (props) => {
   );
 };
 
-export default DialogEditarRegistro;
+export default DialogEditarRegistroProfesor;

@@ -14,7 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DialogUpdateProfesor from "../dialog/DialogUpdateProfesor";
 import Carga from "../Carga";
-import DialogUsarArchivo from "../dialog/DialogUsarArchivo";
+import DialogUsarArchivoProfesor from "../dialog/DialogUsarArchivoProfesor";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
 import PublishIcon from "@mui/icons-material/Publish";
 
@@ -282,7 +282,7 @@ const SeccionProfesores = (props) => {
         getProfesores={getProfesores}
         cabeceraId={cabeceraId}
       />
-      <DialogUsarArchivo
+      <DialogUsarArchivoProfesor
         cedulas={cedulas}
         mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
         setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}

@@ -15,16 +15,15 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import Carga from "../Carga";
 import { useState, useEffect, useRef } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DialogDeConfirmacion from "./DialogDeConfirmacion";
-import DialogEditarRegistro from "./DialogEditarRegistro";
+import DialogEditarRegistroProfesor from "./DialogEditarRegistroProfesor";
 
-const DialogUsarArchivo = (props) => {
+const DialogUsarArchivoProfesor = (props) => {
   const [hoveredCell, setHoveredCell] = useState(undefined);
   const inputRef = useRef(undefined);
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(undefined);
@@ -307,7 +306,7 @@ const DialogUsarArchivo = (props) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja 1");
-    XLSX.writeFile(workbook, "Archivo Final.xlsx");
+    XLSX.writeFile(workbook, "Archivo Final Profesores.xlsx");
   };
 
   return (
@@ -927,7 +926,7 @@ const DialogUsarArchivo = (props) => {
         setMostrarDialogDeConfirmacion={setmostrarDialogDeConfirmacion}
         setBorrarRow={setBorrarRow}
       />
-      <DialogEditarRegistro
+      <DialogEditarRegistroProfesor
         mostrarDialogEditarRegistro={mostrarDialogEditarRegistro}
         setMostrarDialogEditarRegistro={setMostrarDialogEditarRegistro}
         campoPorEditarDialogEditarRegistro={campoPorEditarDialogEditarRegistro}
@@ -946,4 +945,4 @@ const DialogUsarArchivo = (props) => {
   );
 };
 
-export default DialogUsarArchivo;
+export default DialogUsarArchivoProfesor;

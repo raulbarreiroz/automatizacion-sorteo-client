@@ -10,7 +10,6 @@ import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { useEffect } from "react";
 import ErrorIcon from "@mui/icons-material/Error";
 
 const DialogUpdateProfesor = (props) => {

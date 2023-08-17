@@ -12,73 +12,47 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DialogUpdateProfesor from "../dialog/DialogUpdateProfesor";
+import DialogUpdateRegalo from "../dialog/DialogUpdateRegalo";
 import Carga from "../Carga";
-import DialogUsarArchivo from "../dialog/DialogUsarArchivo";
+import DialogUsarArchivoRegalo from "../dialog/DialogUsarArchivoRegalo";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
 import PublishIcon from "@mui/icons-material/Publish";
 
 const SeccionRegalos = (props) => {
   const [cargando, setCargando] = useState(false);
   const gridBotones = useRef(undefined);
-  const [modoDialogUpdateProfesor, setModoDialogUpdateProfesor] =
+  const [modoDialogUpdateRegalo, setModoDialogUpdateRegalo] =
     useState(undefined);
   const [hoveredCell, setHoveredCell] = useState(undefined);
-  const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] =
+  const [mostrarDialogUpdateRegalo, setMostrarDialogUpdateRegalo] =
     useState(false);
   const [mostrarDialogUsarArchivo, setMostrarDialogUsarArchivo] =
     useState(false);
-  const [profesorSeleccionado, setProfesorSeleccionado] = useState(undefined);
-  const [profesores, setProfesores] = useState(undefined);
-  const [cabeceraId] = useState(12); // cabecera de catalogo de facultad
-  const [facultades, setFacultades] = useState(undefined);
-  const [cedulas, setCedulas] = useState(undefined);
-  const getProfesores = useCallback(async () => {
+  const [regaloSeleccionado, setRegaloSeleccionado] = useState(undefined);
+  const [regalos, setRegalos] = useState(undefined);
+  const getRegalos = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/profesores`
+        `${process.env.REACT_APP_SERVERURL}/regalos`
       );
-      const profesores = await response.json();
+      const regalos = await response.json();
 
-      if (profesores?.length) {
-        setProfesores(profesores);
-        const cedulas = profesores?.map((profesor) => profesor?.cedula);
-        setCedulas(cedulas?.length ? cedulas : []);
+      if (regalos?.length) {
+        setRegalos(regalos);
       } else {
-        setProfesores([]);
-        setCedulas([]);
+        setRegalos([]);
       }
     } catch (err) {
       console.log(err);
-      setProfesores([]);
-      setCedulas([]);
+      setRegalos([]);
     }
     setCargando(false);
   }, []);
-  const getFacultades = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/catalogo/${cabeceraId}`
-      );
-      const cabecera = await response.json();
-      if (cabecera?.length) {
-        const facultades = cabecera[0]?.detalles;
-        setFacultades(facultades?.length ? facultades : []);
-      } else {
-        setFacultades([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setFacultades([]);
-    }
-    setCargando(false);
-  }, [cabeceraId]);
 
   useEffect(() => {
     setCargando(true);
-    getFacultades();
-    getProfesores();
-  }, [getProfesores, getFacultades]);
+    getRegalos();
+  }, [getRegalos]);
 
   return (
     <>
@@ -96,12 +70,12 @@ const SeccionRegalos = (props) => {
             endIcon={<AddIcon />}
             sx={{ mb: 2 }}
             onClick={(e) => {
-              setMostrarDialogUpdateProfesor(true);
-              setModoDialogUpdateProfesor("ADD");
-              setProfesorSeleccionado(undefined);
+              setMostrarDialogUpdateRegalo(true);
+              setModoDialogUpdateRegalo("ADD");
+              setRegaloSeleccionado(undefined);
             }}
           >
-            Profesor
+            Regalo
           </Button>
           <Button
             variant="outlined"
@@ -120,17 +94,17 @@ const SeccionRegalos = (props) => {
           xs={12}
           style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: profesores?.length ? "scroll" : "hidden",
+            overflow: regalos?.length ? "scroll" : "hidden",
           }}
         >
-          {profesores?.length ? (
+          {regalos?.length ? (
             <TableContainer
               component={Paper}
               style={{
                 overflowX: "initial",
               }}
             >
-              <Table aria-label="tabla de profesores" stickyHeader>
+              <Table aria-label="tabla de Regalos" stickyHeader>
                 <TableHead>
                   <TableRow>
                     <TableCell
@@ -140,7 +114,7 @@ const SeccionRegalos = (props) => {
                         borderStartStartRadius: "5px",
                       }}
                     >
-                      Cédula
+                      NOMBRE
                     </TableCell>
                     <TableCell
                       style={{
@@ -148,7 +122,7 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      Nombre completo
+                      AUSPICIANTE
                     </TableCell>
                     <TableCell
                       style={{
@@ -156,7 +130,7 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      Facultad
+                      IMAGEN
                     </TableCell>
                     <TableCell
                       style={{
@@ -196,9 +170,9 @@ const SeccionRegalos = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {profesores.map((row, i) => (
+                  {regalos.map((row, i) => (
                     <TableRow
-                      key={`${row?.cedula}-${i}`}
+                      key={`${row?.id}-${i}`}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,
@@ -218,16 +192,10 @@ const SeccionRegalos = (props) => {
                       }}
                     >
                       <TableCell component="th" scope="row">
-                        {row.cedula}
+                        {row.nombre}
                       </TableCell>
-                      <TableCell>{`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}</TableCell>
-                      <TableCell>
-                        {
-                          facultades?.filter(
-                            (facultad) => facultad?.id === row?.detalle_id
-                          )[0]?.nombre
-                        }
-                      </TableCell>
+                      <TableCell>{row?.auspiciante}</TableCell>
+                      <TableCell>{row?.imagen}</TableCell>
                       <TableCell>{row.creado_por}</TableCell>
                       <TableCell>{row.fecha_creacion}</TableCell>
                       <TableCell>
@@ -236,9 +204,9 @@ const SeccionRegalos = (props) => {
                             cursor: "pointer",
                           }}
                           onClick={(e) => {
-                            setMostrarDialogUpdateProfesor(true);
-                            setModoDialogUpdateProfesor("EDIT");
-                            setProfesorSeleccionado(row);
+                            setMostrarDialogUpdateRegalo(true);
+                            setModoDialogUpdateRegalo("EDIT");
+                            setRegaloSeleccionado(row);
                           }}
                         />
                       </TableCell>
@@ -248,9 +216,9 @@ const SeccionRegalos = (props) => {
                             cursor: "pointer",
                           }}
                           onClick={(e) => {
-                            setMostrarDialogUpdateProfesor(true);
-                            setModoDialogUpdateProfesor("DELETE");
-                            setProfesorSeleccionado(row);
+                            setMostrarDialogUpdateRegalo(true);
+                            setModoDialogUpdateRegalo("DELETE");
+                            setRegaloSeleccionado(row);
                           }}
                         />
                       </TableCell>
@@ -266,30 +234,25 @@ const SeccionRegalos = (props) => {
                 margin: "10px 0",
               }}
             >
-              No hay profesores registrados
+              No hay Regalos registrados
             </div>
           )}
         </Grid>
       </Paper>
-      <DialogUpdateProfesor
-        mostrarDialogUpdateProfesor={mostrarDialogUpdateProfesor}
-        setMostrarDialogUpdateProfesor={setMostrarDialogUpdateProfesor}
-        modoDialogUpdateProfesor={modoDialogUpdateProfesor}
-        setModoDialogUpdateProfesor={setModoDialogUpdateProfesor}
-        profesorSeleccionado={profesorSeleccionado}
-        facultades={facultades}
+      <DialogUpdateRegalo
+        mostrarDialogUpdateRegalo={mostrarDialogUpdateRegalo}
+        setMostrarDialogUpdateRegalo={setMostrarDialogUpdateRegalo}
+        modoDialogUpdateRegalo={modoDialogUpdateRegalo}
+        setModoDialogUpdateRegalo={setModoDialogUpdateRegalo}
+        regaloSeleccionado={regaloSeleccionado}
         setCargando={setCargando}
-        getProfesores={getProfesores}
-        cabeceraId={cabeceraId}
+        getRegalos={getRegalos}
       />
-      <DialogUsarArchivo
-        cedulas={cedulas}
+      <DialogUsarArchivoRegalo
         mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
         setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}
-        facultades={facultades}
-        cabeceraId={cabeceraId}
         setCargando={setCargando}
-        getProfesores={getProfesores}
+        getRegalos={getRegalos}
       />
       <Carga cargando={cargando} />
     </>

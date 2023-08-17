@@ -136,3 +136,22 @@ export const mensajesPorCampoProfesor = [
     ],
   },
 ];
+
+export const mensajesPorCampoRegalo = [
+  {
+    campo: "nombre",
+    titulo: "nombre",
+    mensajes: [
+      {
+        nombre: mensajeCampoObligatorio,
+        validador: validadorCampoObligatorio,
+        id: 0,
+      },
+    ],
+  },
+  {
+    campo: "auspiciante",
+    titulo: "auspiciante",
+    mensajes: [],
+  },
+];
