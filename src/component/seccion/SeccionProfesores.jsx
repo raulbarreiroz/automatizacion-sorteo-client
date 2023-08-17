@@ -1,205 +1,256 @@
-import { useState, useEffect, useRef } from 'react'
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import SchoolIcon from '@mui/icons-material/School';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import DialogUpdateProfesor from '../dialog/DialogUpdateProfesor';
+import { useState, useEffect, useRef, useCallback } from "react";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import SchoolIcon from "@mui/icons-material/School";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import DialogUpdateProfesor from "../dialog/DialogUpdateProfesor";
+import Carga from "../Carga";
+import DialogUsarArchivo from "../dialog/DialogUsarArchivo";
+import SaveAsIcon from "@mui/icons-material/SaveAs";
+import PublishIcon from "@mui/icons-material/Publish";
 
 const SeccionProfesores = (props) => {
-  const gridBotones = useRef(undefined)
-  const [modoDialogUpdateProfesor, setModoDialogUpdateProfesor] = useState(undefined)
-  const [today, setToday] = useState(undefined)
-  const [hoveredCell, setHoveredCell] = useState(undefined)
-  const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] = useState(false)
-  const [dataProfesor, setDataProfesor] = useState(undefined)
-  
-  useEffect(() => {    
-    const today = new Date()    
-    const dia = today?.getDate()
-    const mes = today?.getMonth() + 1
-    const anio = today?.getFullYear()
-    setToday(`${dia}/${mes}/${anio}`)
-  }, [])
+  const [cargando, setCargando] = useState(false);
+  const gridBotones = useRef(undefined);
+  const [modoDialogUpdateProfesor, setModoDialogUpdateProfesor] =
+    useState(undefined);
+  const [hoveredCell, setHoveredCell] = useState(undefined);
+  const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] =
+    useState(false);
+  const [mostrarDialogUsarArchivo, setMostrarDialogUsarArchivo] =
+    useState(false);
+  const [profesorSeleccionado, setProfesorSeleccionado] = useState(undefined);
+  const [profesores, setProfesores] = useState(undefined);
+  const [cabeceraId] = useState(12); // cabecera de catalogo de facultad
+  const [facultades, setFacultades] = useState(undefined);
+  const [cedulas, setCedulas] = useState(undefined);
+  const getProfesores = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/profesores`
+      );
+      const profesores = await response.json();
+
+      if (profesores?.length) {
+        setProfesores(profesores);
+        const cedulas = profesores?.map((profesor) => profesor?.cedula);
+        setCedulas(cedulas?.length ? cedulas : []);
+      } else {
+        setProfesores([]);
+        setCedulas([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setProfesores([]);
+      setCedulas([]);
+    }
+    setCargando(false);
+  }, []);
+  const getFacultades = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/catalogo/${cabeceraId}`
+      );
+      const cabecera = await response.json();
+      if (cabecera?.length) {
+        const facultades = cabecera[0]?.detalles;
+        setFacultades(facultades?.length ? facultades : []);
+      } else {
+        setFacultades([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setFacultades([]);
+    }
+    setCargando(false);
+  }, [cabeceraId]);
 
   useEffect(() => {
-    console.log('dataProfesor: ')
-    console.log(dataProfesor)
-  }, [dataProfesor])
+    setCargando(true);
+    getFacultades();
+    getProfesores();
+  }, [getProfesores, getFacultades]);
 
-  function createProfesor(cedula, nombreCompleto, facultad, creadoPor) {
-    return { cedula, nombreCompleto, facultad, creadoPor, today };
-  }
-
-  const rows = [
-    createProfesor('0000000000', 'profesor0', 'facultad1', 'admin'),
-    createProfesor('0000000001', 'profesor1', 'facultad1', 'admin'),
-    createProfesor('0000000002', 'profesor2', 'facultad2', 'admin'),
-    createProfesor('0000000003', 'profesor3', 'facultad2', 'admin'),
-    createProfesor('0000000004', 'profesor4', 'facultad3', 'admin'),
-    createProfesor('0000000005', 'profesor5', 'facultad1', 'admin'),
-    createProfesor('0000000006', 'profesor6', 'facultad1', 'admin'),
-    createProfesor('0000000007', 'profesor7', 'facultad1', 'admin'),
-    createProfesor('0000000008', 'profesor8', 'facultad2', 'admin'),
-  ];
-
-  return (     
+  return (
     <>
       <Paper
-        style={{        
-          width: '100%',
-          height: '100%',
-          padding: '2.5vh 1.5vw'
+        style={{
+          width: "100%",
+          height: "100%",
+          padding: "2.5vh 1.5vw",
         }}
       >
         <Grid ref={gridBotones}>
-          <Button variant="outlined" 
-            startIcon={<SchoolIcon />} endIcon={<AddIcon />}
-            sx={{mb: 2,}}
-            onClick={e => {
-              setMostrarDialogUpdateProfesor(true)
-              setModoDialogUpdateProfesor('ADD')
-              setDataProfesor(undefined)
+          <Button
+            variant="outlined"
+            startIcon={<SchoolIcon />}
+            endIcon={<AddIcon />}
+            sx={{ mb: 2 }}
+            onClick={(e) => {
+              setMostrarDialogUpdateProfesor(true);
+              setModoDialogUpdateProfesor("ADD");
+              setProfesorSeleccionado(undefined);
             }}
-          
->
+          >
             Profesor
-          </Button>                                    
-          <Button variant="outlined" sx={{mb: 2, ml: 2}} >
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{ mb: 2, ml: 2 }}
+            startIcon={<SaveAsIcon />}
+            endIcon={<PublishIcon />}
+            onClick={(e) => {
+              setMostrarDialogUsarArchivo(true);
+            }}
+          >
             Usar archivo
-          </Button>                                  
+          </Button>
         </Grid>
-        <Grid 
-          item xs={12}
-          style={{          
+        <Grid
+          item
+          xs={12}
+          style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: 'scroll'
+            overflow: profesores?.length ? "scroll" : "hidden",
           }}
-        >        
-            <TableContainer 
-              component={Paper}            
+        >
+          {profesores?.length ? (
+            <TableContainer
+              component={Paper}
               style={{
-                overflowX: 'initial'
+                overflowX: "initial",
               }}
             >
-              <Table 
-                aria-label="tabla de profesores"
-                stickyHeader
-              >
+              <Table aria-label="tabla de profesores" stickyHeader>
                 <TableHead>
-                  <TableRow >
+                  <TableRow>
                     <TableCell
                       style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white',
-                        borderStartStartRadius: '5px'                      
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                        borderStartStartRadius: "5px",
                       }}
                     >
                       Cédula
                     </TableCell>
                     <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}  
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
                     >
                       Nombre completo
                     </TableCell>
                     <TableCell
                       style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}  
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
                     >
                       Facultad
                     </TableCell>
                     <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}  
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
                     >
-                      CreadoPor
+                      Creado por
                     </TableCell>
                     <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}  
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
                     >
-                      FechaCreacion
+                      Fecha de Creacion
                     </TableCell>
                     <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white'                      
-                      }}                      
-                      width='20px'
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
+                      width="20px"
                     >
                       Editar
                     </TableCell>
                     <TableCell
-                    style={{
-                        backgroundColor: 'rgb(153, 0, 0)',
-                        color: 'white',
-                        borderStartEndRadius: '5px'
-                      }}                    
-                      width='20px'  
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                        borderStartEndRadius: "5px",
+                      }}
+                      width="20px"
                     >
                       Borrar
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, i) => (
+                  {profesores.map((row, i) => (
                     <TableRow
-                      key={row.cedula}
-                      sx={{ 
-                        '&:last-child td, &:last-child th': { 
-                          border: 0 
+                      key={`${row?.cedula}-${i}`}
+                      sx={{
+                        "&:last-child td, &:last-child th": {
+                          border: 0,
                         },
-                        backgroundColor: hoveredCell !== undefined ? 
-                          hoveredCell === i ? 'rgba(153, 0, 0, 0.2)' : 'white' : 
-                          'white'
+                        backgroundColor:
+                          hoveredCell !== undefined
+                            ? hoveredCell === i
+                              ? "rgba(153, 0, 0, 0.2)"
+                              : "white"
+                            : "white",
                       }}
-                      onMouseEnter={e => {
-                        setHoveredCell(i)
+                      onMouseEnter={(e) => {
+                        setHoveredCell(i);
                       }}
-                      onMouseLeave={e => {                      
-                        setHoveredCell(undefined)
+                      onMouseLeave={(e) => {
+                        setHoveredCell(undefined);
                       }}
                     >
                       <TableCell component="th" scope="row">
                         {row.cedula}
                       </TableCell>
-                      <TableCell>{row.nombreCompleto}</TableCell>
-                      <TableCell>{row.facultad}</TableCell>
-                      <TableCell>{row.creadoPor}</TableCell>
-                      <TableCell>{row.today}</TableCell>
+                      <TableCell>{`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}</TableCell>
                       <TableCell>
-                        <EditIcon 
+                        {
+                          facultades?.filter(
+                            (facultad) => facultad?.id === row?.detalle_id
+                          )[0]?.nombre
+                        }
+                      </TableCell>
+                      <TableCell>{row.creado_por}</TableCell>
+                      <TableCell>{row.fecha_creacion}</TableCell>
+                      <TableCell>
+                        <EditIcon
                           style={{
-                            cursor: 'pointer'
+                            cursor: "pointer",
                           }}
-                          onClick={e => {
-                            setMostrarDialogUpdateProfesor(true)
-                            setModoDialogUpdateProfesor('EDIT')                            
-                            setDataProfesor(row)
+                          onClick={(e) => {
+                            setMostrarDialogUpdateProfesor(true);
+                            setModoDialogUpdateProfesor("EDIT");
+                            setProfesorSeleccionado(row);
                           }}
                         />
-                      </TableCell> 
+                      </TableCell>
                       <TableCell>
-                        <DeleteForeverIcon 
+                        <DeleteForeverIcon
                           style={{
-                            cursor: 'pointer'
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            setMostrarDialogUpdateProfesor(true);
+                            setModoDialogUpdateProfesor("DELETE");
+                            setProfesorSeleccionado(row);
                           }}
                         />
                       </TableCell>
@@ -207,19 +258,42 @@ const SeccionProfesores = (props) => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>        
-        </Grid>        
-      </Paper>  
-      <DialogUpdateProfesor 
-        mostrarDialogUpdateProfesor={mostrarDialogUpdateProfesor} 
+            </TableContainer>
+          ) : (
+            <div
+              style={{
+                textAlign: "center",
+                margin: "10px 0",
+              }}
+            >
+              No hay profesores registrados
+            </div>
+          )}
+        </Grid>
+      </Paper>
+      <DialogUpdateProfesor
+        mostrarDialogUpdateProfesor={mostrarDialogUpdateProfesor}
         setMostrarDialogUpdateProfesor={setMostrarDialogUpdateProfesor}
         modoDialogUpdateProfesor={modoDialogUpdateProfesor}
         setModoDialogUpdateProfesor={setModoDialogUpdateProfesor}
-        dataProfesor={dataProfesor}
-        setDataProfesor={setDataProfesor}
+        profesorSeleccionado={profesorSeleccionado}
+        facultades={facultades}
+        setCargando={setCargando}
+        getProfesores={getProfesores}
+        cabeceraId={cabeceraId}
       />
-    </>  
-  )
-}
+      <DialogUsarArchivo
+        cedulas={cedulas}
+        mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
+        setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}
+        facultades={facultades}
+        cabeceraId={cabeceraId}
+        setCargando={setCargando}
+        getProfesores={getProfesores}
+      />
+      <Carga cargando={cargando} />
+    </>
+  );
+};
 
-export  default SeccionProfesores
+export default SeccionProfesores;

@@ -10,16 +10,105 @@ import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const DialogUpdateProfesor = (props) => {
   const handleSubmit = (event) => {
+    const crearProfesor = async () => {
+      const data = new FormData(event.currentTarget);
+      const cedula = data.get("cedula");
+      const facultad = data.get("facultad");
+      const nombre1 = data.get("nombre1");
+      const nombre2 = data.get("nombre2");
+      const apellido1 = data.get("apellido1");
+      const apellido2 = data.get("apellido2");
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVERURL}/profesor`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              cedula,
+              detalleId: facultad,
+              nombre1,
+              nombre2,
+              apellido1,
+              apellido2,
+              cabeceraId: props?.cabeceraId,
+              creadoPor: "admin@test.com",
+            }),
+          }
+        );
+        if (response.status === 200) {
+          props?.setMostrarDialogUpdateProfesor(false);
+          props?.getProfesores();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const actualizarProfesor = async () => {
+      const data = new FormData(event.currentTarget);
+      const cedula = data.get("cedula");
+      const facultad = data.get("facultad");
+      const nombre1 = data.get("nombre1");
+      const nombre2 = data.get("nombre2");
+      const apellido1 = data.get("apellido1");
+      const apellido2 = data.get("apellido2");
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              cedula,
+              detalleId: facultad,
+              nombre1,
+              nombre2,
+              apellido1,
+              apellido2,
+              cabeceraId: props?.cabeceraId,
+            }),
+          }
+        );
+        if (response.status === 200) {
+          props?.setMostrarDialogUpdateProfesor(false);
+          props?.getProfesores();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const borrarProfesor = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.id}`,
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (response.status === 200) {
+          props?.setMostrarDialogUpdateProfesor(false);
+          props?.getProfesores();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+
+    props?.setCargando(true);
+    if (props?.modoDialogUpdateProfesor === "ADD") crearProfesor();
+    else if (props?.modoDialogUpdateProfesor === "EDIT") actualizarProfesor();
+    else if (props?.modoDialogUpdateProfesor === "DELETE") borrarProfesor();
   };
 
   return (
@@ -31,11 +120,33 @@ const DialogUpdateProfesor = (props) => {
           alignItems: "center",
         }}
       >
-        <Typography>
-          {props?.modoDialogUpdateProfesor === "ADD"
-            ? "Añadir nuevo profesor"
-            : "Editar profesor"}
-        </Typography>
+        <div>
+          {props?.modoDialogUpdateProfesor === "ADD" ? (
+            <Typography>{`AÑADIR NUEVO PROFESOR`}</Typography>
+          ) : props?.modoDialogUpdateProfesor === "EDIT" ? (
+            <Typography>EDITAR PROFESOR</Typography>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <ErrorIcon
+                style={{
+                  color: "red",
+                }}
+              />
+              <Typography
+                style={{
+                  marginLeft: 5,
+                }}
+              >
+                EL PROFESOR SERÁ ELIMINADO
+              </Typography>
+            </div>
+          )}
+        </div>
         <Button
           onClick={(e) => {
             props?.setMostrarDialogUpdateProfesor(false);
@@ -61,7 +172,10 @@ const DialogUpdateProfesor = (props) => {
                 name="cedula"
                 autoComplete="cedula"
                 size="small"
-                value={props?.dataProfesor?.cedula || ""}
+                defaultValue={props?.profesorSeleccionado?.cedula || ""}
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -69,13 +183,29 @@ const DialogUpdateProfesor = (props) => {
               <Select
                 variant="outlined"
                 size="small"
-                id="facultad-select"
+                id="facultad"
+                name="facultad"
                 fullWidth
-                value={props?.dataProfesor?.facultad || "facultad1"}
+                defaultValue={
+                  props?.profesorSeleccionado?.detalle_id ||
+                  (props?.facultades?.length ? props?.facultades[0]?.id : -1)
+                }
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE"
+                    ? true
+                    : props?.facultades?.length
+                    ? false
+                    : true
+                }
               >
-                <MenuItem value={"facultad1"}>Facultad 1</MenuItem>
-                <MenuItem value={"facultad2"}>Facultad 2</MenuItem>
-                <MenuItem value={"facultad3"}>Facultad 3</MenuItem>
+                {props?.facultades?.length &&
+                  props?.facultades?.map((facultad) => {
+                    return (
+                      <MenuItem key={facultad?.id} value={facultad?.id}>
+                        {facultad?.nombre}
+                      </MenuItem>
+                    );
+                  })}
               </Select>
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -83,9 +213,13 @@ const DialogUpdateProfesor = (props) => {
               <TextField
                 size="small"
                 fullWidth
-                id="primerNombre"
-                name="primerNombre"
-                autoComplete="primerNombre"
+                id="nombre1"
+                name="nombre1"
+                autoComplete="nombre1"
+                defaultValue={props?.profesorSeleccionado?.nombre1 || ""}
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -93,9 +227,13 @@ const DialogUpdateProfesor = (props) => {
               <TextField
                 fullWidth
                 size="small"
-                id="segundoNombre"
-                name="segundoNombre"
-                autoComplete="segundoNombre"
+                id="nombre2"
+                name="nombre2"
+                autoComplete="nombre2"
+                defaultValue={props?.profesorSeleccionado?.nombre2 || ""}
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -103,10 +241,13 @@ const DialogUpdateProfesor = (props) => {
               <TextField
                 size="small"
                 fullWidth
-                name="primerApellido"
-                type="primerApellido"
-                id="primerApellido"
-                autoComplete="primerApellido"
+                name="apellido1"
+                type="apellido1"
+                id="apellido1"
+                defaultValue={props?.profesorSeleccionado?.apellido1 || ""}
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -114,10 +255,13 @@ const DialogUpdateProfesor = (props) => {
               <TextField
                 fullWidth
                 size="small"
-                name="segundoApellido"
-                type="segundoApellido"
-                id="segundoApellido"
-                autoComplete="segundoApellido"
+                name="apellido2"
+                type="apellido2"
+                id="apellido2"
+                defaultValue={props?.profesorSeleccionado?.apellido2 || ""}
+                disabled={
+                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                }
               />
             </Grid>
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
@@ -129,12 +273,12 @@ const DialogUpdateProfesor = (props) => {
                   color: "white",
                   width: "100%",
                 }}
-                onClick={(e) => {
-                  console.log("props: ");
-                  console.log(props);
-                }}
               >
-                Guardar
+                {props?.modoDialogUpdateProfesor === "ADD"
+                  ? "GUARDAR"
+                  : props?.modoDialogUpdateProfesor === "EDIT"
+                  ? "EDITAR"
+                  : "ELIMINAR"}
               </Button>
             </Grid>
           </Grid>

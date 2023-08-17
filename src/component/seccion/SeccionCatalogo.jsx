@@ -40,7 +40,7 @@ const SeccionCatalogo = (props) => {
         `${process.env.REACT_APP_SERVERURL}/catalogos`
       );
       const catalogos = await response.json();
-      setCatalogos(catalogos || []);
+      setCatalogos(catalogos?.length ? catalogos : []);
       setCabeceras(
         catalogos?.map((cabecera) => ({
           nombre: cabecera?.nombre,
@@ -111,7 +111,7 @@ const SeccionCatalogo = (props) => {
               }}
               variant="outlined"
               size="small"
-              id="facultad-select"
+              id="cabecera-select"
               value={cabeceraSeleccionada?.id}
               onChange={(e) => {
                 const cabeceraIdSeleccionada = e?.target?.value;
@@ -127,13 +127,14 @@ const SeccionCatalogo = (props) => {
                 } else setcabeceraSeleccionada({});
               }}
             >
-              {cabeceras?.map((cabecera) => {
-                return (
-                  <MenuItem key={cabecera?.id} value={cabecera?.id}>
-                    {cabecera?.nombre}
-                  </MenuItem>
-                );
-              })}
+              {cabeceras?.length &&
+                cabeceras?.map((cabecera) => {
+                  return (
+                    <MenuItem key={cabecera?.id} value={cabecera?.id}>
+                      {cabecera?.nombre}
+                    </MenuItem>
+                  );
+                })}
             </Select>
           )}
           <Button
@@ -224,7 +225,7 @@ const SeccionCatalogo = (props) => {
                 <TableBody>
                   {detalles.map((row, i) => (
                     <TableRow
-                      key={`${row?.cedula}-${i}`}
+                      key={`${row?.nombre}-${i}`}
                       sx={{
                         "&:last-child td, &:last-child th": {
                           border: 0,

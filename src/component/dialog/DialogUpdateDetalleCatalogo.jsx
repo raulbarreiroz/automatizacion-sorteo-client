@@ -105,11 +105,11 @@ const DialogUpdateDetalleCatalogo = (props) => {
           alignItems: "center",
         }}
       >
-        <Typography>
+        <div>
           {props?.modoDialogUpdateDetalleCatalogo === "ADD" ? (
-            `Añadir nuevo detalle ( ${props?.cabeceraSeleccionada?.nombre} )`
+            <Typography>{`Añadir nuevo detalle ( ${props?.cabeceraSeleccionada?.nombre} )`}</Typography>
           ) : props?.modoDialogUpdateDetalleCatalogo === "EDIT" ? (
-            "EDITAR DETALLE"
+            <Typography>EDITAR DETALLE</Typography>
           ) : (
             <div
               style={{
@@ -122,16 +122,16 @@ const DialogUpdateDetalleCatalogo = (props) => {
                   color: "red",
                 }}
               />
-              <div
+              <Typography
                 style={{
                   marginLeft: 5,
                 }}
               >
                 EL REGISTRO SERÁ ELIMINADO
-              </div>
+              </Typography>
             </div>
           )}
-        </Typography>
+        </div>
         <Button
           onClick={(e) => {
             props?.setMostrarDialogUpdateDetalleCatalogo(false);
@@ -189,10 +189,6 @@ const DialogUpdateDetalleCatalogo = (props) => {
                   backgroundColor: "#990000",
                   color: "white",
                   width: "100%",
-                }}
-                onClick={(e) => {
-                  console.log("props: ");
-                  console.log(props);
                 }}
               >
                 {props?.modoDialogUpdateDetalleCatalogo === "ADD"
