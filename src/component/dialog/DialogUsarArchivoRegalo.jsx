@@ -62,11 +62,12 @@ const DialogUsarArchivoRegalo = (props) => {
 
   useEffect(() => {
     setArrayDeArchivoSeleccionadoConNovedades(
-      arrayDeArchivoSeleccionado?.map((row) => {
+      arrayDeArchivoSeleccionado?.map((row, i) => {
         const rowNombre = row?.nombre?.trim() || "";
         const rowAuspiciante = row?.auspiciante?.trim() || "";
 
         const novedades = {
+          id: i,
           rowConError: false,
           nombre: {
             novedad: 0,
@@ -81,7 +82,6 @@ const DialogUsarArchivoRegalo = (props) => {
         };
 
         if (!rowNombre) {
-          
           novedades["nombre"]["novedad"] = 2;
           novedades["nombre"]["mensaje"] =
             "El campo nombre1 es obligatorio, no puede ser un campo vacío";

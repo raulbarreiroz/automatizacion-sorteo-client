@@ -38,6 +38,8 @@ const SeccionRegalos = (props) => {
       const regalos = await response.json();
 
       if (regalos?.length) {
+        console.log('regalos: ')
+        console.log(regalos)
         setRegalos(regalos);
       } else {
         setRegalos([]);

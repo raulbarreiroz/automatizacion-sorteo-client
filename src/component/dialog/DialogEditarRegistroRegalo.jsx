@@ -23,8 +23,6 @@ import MenuItem from "@mui/material/MenuItem";
 const DialogEditarRegistroProfesor = (props) => {
   const [mensajesSeleccionados, setMensajesSeleccionado] = useState(undefined);
   const [campo, setCampo] = useState("");
-  const [cedulasRepetidasEnArchivo, setCedulasRepetidasEnArchivo] =
-    useState(undefined);
 
   useEffect(() => {
     if (props?.rowSeleccionado) {
@@ -50,26 +48,8 @@ const DialogEditarRegistroProfesor = (props) => {
             let validado = false;
             const rowId = row?.id;
             const rowValidador = row?.validador;
-            if (rowId === 0 || rowId === 2 || rowId === 3) {
+            if (rowId === 0) {
               validado = rowValidador(campo);
-            } else if (rowId === 1) {
-              validado = rowValidador(campo, 10);
-            } else if (rowId === 4) {
-              if (props?.campoPorEditarDialogEditarRegistro === "facultad") {
-                validado = !rowValidador(campo, props?.facultades)?.length > 0;
-              } else if (
-                props?.campoPorEditarDialogEditarRegistro === "cedula"
-              ) {
-                validado = !rowValidador(campo, props?.cedulas)?.length > 0;
-              }
-            } else if (rowId === 5) {
-              validado =
-                !rowValidador(
-                  campo,
-                  props?.arrayDeArchivoSeleccionadoConNovedades
-                    ?.filter((row) => row?.cedula?.novedad === 0)
-                    ?.map((row) => row?.cedula?.valor)
-                )?.length > 0;
             }
             row["validado"] = validado;
             return row;
@@ -189,52 +169,20 @@ const DialogEditarRegistroProfesor = (props) => {
           justifyContent={"space-between"}
         >
           <Grid item xs={12} sm={8}>
-            {props?.campoPorEditarDialogEditarRegistro === "facultad" ? (
-              <TextField
-                id="outlined-select"
-                label={props?.campoPorEditarDialogEditarRegistro}
-                select
-                size="small"
-                fullWidth
-                sx={{
-                  mt: 1,
-                  overflow: "visible",
-                }}
-                value={campo}
-                onChange={(e) => {
-                  setCampo(e?.target?.value);
-                }}
-              >
-                {props?.facultades?.map((facultad) => {
-                  return (
-                    <MenuItem
-                      key={`$${facultad?.id}-{facultad?.cabecera_id}-${facultad?.detalle_id}`}
-                      value={facultad?.id}
-                      onChange={(e) => {
-                        setCampo(e?.target?.value);
-                      }}
-                    >
-                      {facultad?.nombre}
-                    </MenuItem>
-                  );
-                })}
-              </TextField>
-            ) : (
-              <TextField
-                id="outlined-basic"
-                label={props?.campoPorEditarDialogEditarRegistro}
-                variant="outlined"
-                size="small"
-                fullWidth
-                sx={{
-                  mt: 1,
-                }}
-                value={campo}
-                onChange={(e) => {
-                  setCampo(e?.target?.value);
-                }}
-              />
-            )}
+            <TextField
+              id="outlined-basic"
+              label={props?.campoPorEditarDialogEditarRegistro}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{
+                mt: 1,
+              }}
+              value={campo}
+              onChange={(e) => {
+                setCampo(e?.target?.value);
+              }}
+            />
           </Grid>
           <Grid item xs={12} sm={4} sx={{ mt: "6.5px" }}>
             <Button
@@ -254,18 +202,15 @@ const DialogEditarRegistroProfesor = (props) => {
               }
               onClick={(e) => {
                 props?.setMostrarDialogEditarRegistro(false);
+                console.log("mapping: ");
                 const arregloEditado = [
                   ...props?.arrayDeArchivoSeleccionadoConNovedades?.map(
                     (row) => {
-                      if (row?.cedula === props?.rowSeleccionado?.cedula) {
+                      console.log(row);
+                      console.log(props?.rowSeleccionado);
+                      if (row?.id === props?.rowSeleccionado?.id) {
                         row[props?.campoPorEditarDialogEditarRegistro] = {
-                          valor:
-                            props?.campoPorEditarDialogEditarRegistro ===
-                            "facultad"
-                              ? props?.facultades?.filter(
-                                  (facultad) => facultad?.id === campo
-                                )[0]?.nombre
-                              : campo,
+                          valor: campo,
                           novedad: 0,
                           mensaje: "",
                         };
