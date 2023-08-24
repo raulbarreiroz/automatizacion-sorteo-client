@@ -1,24 +1,24 @@
-import * as React from 'react';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import AppsIcon from '@mui/icons-material/Apps';
-import CasinoIcon from '@mui/icons-material/Casino';
-import StorageIcon from '@mui/icons-material/Storage';
-import SchoolIcon from '@mui/icons-material/School';
-import RedeemIcon from '@mui/icons-material/Redeem';
-import SettingsIcon from '@mui/icons-material/Settings';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import * as React from "react";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import AppsIcon from "@mui/icons-material/Apps";
+import CasinoIcon from "@mui/icons-material/Casino";
+import StorageIcon from "@mui/icons-material/Storage";
+import SchoolIcon from "@mui/icons-material/School";
+import RedeemIcon from "@mui/icons-material/Redeem";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { NavLink } from "react-router-dom";
 
 const style = {
-  color: 'black',
-  textDecoration: 'none',
-}
+  color: "black",
+  textDecoration: "none",
+};
 
 export const mainListItems = (
   <React.Fragment>
-    <NavLink to='/dashboard/inicio' style={style}>
+    <NavLink to="/dashboard/inicio" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <AppsIcon />
@@ -26,7 +26,7 @@ export const mainListItems = (
         <ListItemText primary="Inicio" />
       </ListItemButton>
     </NavLink>
-    <NavLink to='/dashboard/sorteo' style={style}>
+    <NavLink to="/dashboard/sorteo" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <CasinoIcon />
@@ -38,16 +38,16 @@ export const mainListItems = (
 );
 
 export const secondaryListItems = (
-  <React.Fragment>        
-    <NavLink to='/dashboard/profesores' style={style}>
-      <ListItemButton>      
+  <React.Fragment>
+    <NavLink to="/dashboard/profesores" style={style}>
+      <ListItemButton>
         <ListItemIcon>
           <SchoolIcon />
         </ListItemIcon>
         <ListItemText primary="Profesores" />
       </ListItemButton>
     </NavLink>
-    <NavLink to='/dashboard/regalos' style={style}>
+    <NavLink to="/dashboard/regalos" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <RedeemIcon />
@@ -55,15 +55,7 @@ export const secondaryListItems = (
         <ListItemText primary="Regalos" />
       </ListItemButton>
     </NavLink>
-    <NavLink to='/dashboard/sorteos' style={style}>
-      <ListItemButton>
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Sorteos" />
-      </ListItemButton>
-    </NavLink>
-    <NavLink to='/dashboard/usuarios' style={style}>
+    <NavLink to="/dashboard/usuarios" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <AssignmentIndIcon />
@@ -71,7 +63,7 @@ export const secondaryListItems = (
         <ListItemText primary="Usuarios" />
       </ListItemButton>
     </NavLink>
-    <NavLink to='/dashboard/catalogo' style={style}>
+    <NavLink to="/dashboard/catalogo" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <StorageIcon />

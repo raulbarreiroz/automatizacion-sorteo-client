@@ -7,20 +7,97 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const DialogUpdateRegalo = (props) => {
   const inputRef = useRef(undefined);
   const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
+  const [nombreDonador, setNombreDonador] = useState(undefined);
+  const [tipoDonacionSeleccionada, setTipoDonacionSeleccionada] =
+    useState(undefined);
+  const [facultadSelccionada, setFacultadSeleccionada] = useState(undefined);
+  const a = useRef(undefined);
+
+  useEffect(() => {
+    console.log("nombreDonador:");
+    console.log(nombreDonador);
+  }, [nombreDonador]);
+
+  useEffect(() => {
+    if (props?.mostrarDialogUpdateRegalo) {
+      const regaloSeleccionado = props?.regaloSeleccionado;
+      const tiposDeDonaciones = props?.tiposDeDonaciones;
+      const facultades = props?.facultades;
+      if (regaloSeleccionado?.tipo_donacion_id) {
+        setTipoDonacionSeleccionada(regaloSeleccionado?.tipo_donacion_id);
+      } else {
+        if (tiposDeDonaciones?.length) {
+          setTipoDonacionSeleccionada(tiposDeDonaciones[0]?.id);
+        } else {
+          setTipoDonacionSeleccionada("");
+        }
+      }
+
+      if (regaloSeleccionado?.facultad_id) {
+        setFacultadSeleccionada(regaloSeleccionado?.facultad_id);
+      } else {
+        if (facultades?.length) {
+          setFacultadSeleccionada(facultades[0]?.id);
+        } else {
+          setFacultadSeleccionada("");
+        }
+      }
+    }
+  }, [
+    props?.regaloSeleccionado,
+    props?.mostrarDialogUpdateRegalo,
+    props?.tiposDeDonaciones,
+    props?.facultades,
+  ]);
+
+  useEffect(() => {
+    if (
+      facultadSelccionada &&
+      tipoDonacionSeleccionada &&
+      props?.facultades?.length
+    ) {
+      let filtro = undefined;
+      if (tipoDonacionSeleccionada === 1) {
+        filtro = "director_nombre";
+      } else if (tipoDonacionSeleccionada === 2) {
+        filtro = "asociacion";
+      }
+
+      if (filtro && props?.facultades?.length) {
+        setNombreDonador(
+          props?.facultades?.filter(
+            (facultad) => facultad?.id === facultadSelccionada
+          )[0][filtro]
+        );
+      } else {
+        setNombreDonador("ADMINISTRACION CENTRAL");
+      }
+    }
+  }, [facultadSelccionada, tipoDonacionSeleccionada, props?.facultades]);
 
   const handleSubmit = (event) => {
     const crearRegalo = async () => {
       const data = new FormData(event.currentTarget);
       const nombre = data.get("nombre");
-      const auspiciante = data.get("auspiciante");
       const imagen = data.get("imagen");
+
+      console.log(
+        JSON.stringify({
+          nombre,
+          tipoDonacionId: tipoDonacionSeleccionada,
+          facultadId: tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
+          nombreDonador,
+        })
+      );
 
       try {
         const response = await fetch(
@@ -30,9 +107,10 @@ const DialogUpdateRegalo = (props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               nombre,
-              auspiciante,
-              imagen: imagenSeleccionada,
-              creadoPor: "admin@test.com",
+              tipoDonacionId: tipoDonacionSeleccionada,
+              facultadId:
+                tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
+              nombreDonador,
             }),
           }
         );
@@ -48,8 +126,8 @@ const DialogUpdateRegalo = (props) => {
     const actualizarRegalo = async () => {
       const data = new FormData(event.currentTarget);
       const nombre = data.get("nombre");
-      const auspiciante = data.get("auspiciante");
       const imagen = data.get("imagen");
+      console.log(props?.regaloSeleccionado);
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVERURL}/regalo/${props?.regaloSeleccionado?.id}`,
@@ -58,8 +136,10 @@ const DialogUpdateRegalo = (props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               nombre,
-              auspiciante,
-              imagen,
+              tipoDonacionId: tipoDonacionSeleccionada,
+              facultadId:
+                tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
+              nombreDonador,
             }),
           }
         );
@@ -99,7 +179,7 @@ const DialogUpdateRegalo = (props) => {
   };
 
   return (
-    <Dialog fullWidth maxWidth={"sm"} open={props.mostrarDialogUpdateRegalo}>
+    <Dialog fullWidth maxWidth={"ms"} open={props.mostrarDialogUpdateRegalo}>
       <DialogTitle
         style={{
           display: "flex",
@@ -150,7 +230,7 @@ const DialogUpdateRegalo = (props) => {
           sx={{ mt: 0.5 }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={9}>
               <InputLabel required>Nombre</InputLabel>
               <TextField
                 size="small"
@@ -166,21 +246,7 @@ const DialogUpdateRegalo = (props) => {
                 }
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <InputLabel>AUSPICIANTE</InputLabel>
-              <TextField
-                fullWidth
-                size="small"
-                name="auspiciante"
-                type="auspiciante"
-                id="auspiciante"
-                defaultValue={props?.regaloSeleccionado?.auspiciante || ""}
-                disabled={
-                  props?.modoDialogUpdateRegalo === "DELETE" ? true : false
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={3}>
               <InputLabel>IMAGEN</InputLabel>
               <input
                 accept=".jpg,.jpeg,.png"
@@ -202,6 +268,73 @@ const DialogUpdateRegalo = (props) => {
                   SELECCIONAR
                 </Button>
               </label>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>TIPO DE DONACIÓN</InputLabel>
+              {tipoDonacionSeleccionada && (
+                <Select
+                  variant="outlined"
+                  size="small"
+                  id="tipoDeDonacion"
+                  name="tipoDeDonacion"
+                  fullWidth
+                  inputRef={a}
+                  value={tipoDonacionSeleccionada}
+                  onChange={(e) => {
+                    setTipoDonacionSeleccionada(e?.target?.value);
+                  }}
+                  disabled={
+                    props?.modoDialogUpdateRegalo === "DELETE" ? true : false
+                  }
+                >
+                  {props?.tiposDeDonaciones?.length &&
+                    props?.tiposDeDonaciones?.map((tipoDeDonacion) => {
+                      return (
+                        <MenuItem
+                          key={tipoDeDonacion?.id}
+                          value={tipoDeDonacion?.id}
+                        >
+                          {tipoDeDonacion?.nombre}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>SELECCIONE FACULTAD</InputLabel>
+              {facultadSelccionada && (
+                <Select
+                  variant="outlined"
+                  size="small"
+                  id="facultad"
+                  name="facultad"
+                  fullWidth
+                  value={facultadSelccionada}
+                  onChange={(e) => {
+                    setFacultadSeleccionada(e?.target?.value);
+                  }}
+                  disabled={
+                    props?.modoDialogUpdateProfesor === "DELETE"
+                      ? true
+                      : props?.facultades?.length
+                      ? tipoDonacionSeleccionada === 3
+                      : true
+                  }
+                >
+                  {props?.facultades?.length &&
+                    props?.facultades?.map((facultad) => {
+                      return (
+                        <MenuItem key={facultad?.id} value={facultad?.id}>
+                          {facultad?.nombre}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+              )}
+            </Grid>
+            <Grid container item xs={12} sm={12} justifyContent={"center"}>
+              <InputLabel>DONACIÓN DE: {nombreDonador}</InputLabel>
             </Grid>
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
               <Button

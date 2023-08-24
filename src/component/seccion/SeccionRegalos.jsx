@@ -30,6 +30,9 @@ const SeccionRegalos = (props) => {
     useState(false);
   const [regaloSeleccionado, setRegaloSeleccionado] = useState(undefined);
   const [regalos, setRegalos] = useState(undefined);
+  const [tiposDeDonaciones, setTiposDeDonaciones] = useState(undefined);
+  const [donadosPor, setDonadosPor] = useState(undefined);
+  const [facultades, setFacultades] = useState(undefined);
   const getRegalos = useCallback(async () => {
     try {
       const response = await fetch(
@@ -38,8 +41,6 @@ const SeccionRegalos = (props) => {
       const regalos = await response.json();
 
       if (regalos?.length) {
-        console.log('regalos: ')
-        console.log(regalos)
         setRegalos(regalos);
       } else {
         setRegalos([]);
@@ -50,11 +51,71 @@ const SeccionRegalos = (props) => {
     }
     setCargando(false);
   }, []);
+  const getTiposDeDonaciones = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/tiposDeDonaciones`
+      );
+      const tiposDeDonaciones = await response.json();
 
+      if (tiposDeDonaciones?.length) {
+        setTiposDeDonaciones(tiposDeDonaciones);
+      } else {
+        setTiposDeDonaciones([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setTiposDeDonaciones([]);
+    }
+  }, []);
+  const getFacultades = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/facultades`
+      );
+      const facultades = await response.json();
+      if (facultades?.length) {
+        setFacultades(facultades);
+      } else {
+        setFacultades([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setFacultades([]);
+    }
+  }, []);
   useEffect(() => {
     setCargando(true);
+    getTiposDeDonaciones();
+    getFacultades();
     getRegalos();
-  }, [getRegalos]);
+  }, [getRegalos, getTiposDeDonaciones, getFacultades]);
+
+  useEffect(() => {
+    console.log("regalos");
+    console.log(regalos);
+  }, [regalos]);
+
+  useEffect(() => {
+    if (regaloSeleccionado) {
+      if (tiposDeDonaciones) {
+        setDonadosPor(
+          tiposDeDonaciones?.filter(
+            (tipoDeDonacion) =>
+              tipoDeDonacion?.id === regaloSeleccionado?.tipo_donacion_id
+          )[0]?.donado_por
+        );
+      } else {
+        setDonadosPor([]);
+      }
+    } else {
+      if (tiposDeDonaciones) {
+        setDonadosPor(tiposDeDonaciones[0]?.donado_por);
+      } else {
+        setDonadosPor([]);
+      }
+    }
+  }, [regaloSeleccionado, tiposDeDonaciones]);
 
   return (
     <>
@@ -124,7 +185,15 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      AUSPICIANTE
+                      TIPO DONACIÓN
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
+                    >
+                      DONADO POR
                     </TableCell>
                     <TableCell
                       style={{
@@ -133,22 +202,6 @@ const SeccionRegalos = (props) => {
                       }}
                     >
                       IMAGEN
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Creado por
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Fecha de Creacion
                     </TableCell>
                     <TableCell
                       style={{
@@ -172,60 +225,63 @@ const SeccionRegalos = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {regalos.map((row, i) => (
-                    <TableRow
-                      key={`${row?.id}-${i}`}
-                      sx={{
-                        "&:last-child td, &:last-child th": {
-                          border: 0,
-                        },
-                        backgroundColor:
-                          hoveredCell !== undefined
-                            ? hoveredCell === i
-                              ? "rgba(153, 0, 0, 0.2)"
-                              : "white"
-                            : "white",
-                      }}
-                      onMouseEnter={(e) => {
-                        setHoveredCell(i);
-                      }}
-                      onMouseLeave={(e) => {
-                        setHoveredCell(undefined);
-                      }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.nombre}
-                      </TableCell>
-                      <TableCell>{row?.auspiciante}</TableCell>
-                      <TableCell>{row?.imagen}</TableCell>
-                      <TableCell>{row.creado_por}</TableCell>
-                      <TableCell>{row.fecha_creacion}</TableCell>
-                      <TableCell>
-                        <EditIcon
-                          style={{
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            setMostrarDialogUpdateRegalo(true);
-                            setModoDialogUpdateRegalo("EDIT");
-                            setRegaloSeleccionado(row);
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <DeleteForeverIcon
-                          style={{
-                            cursor: "pointer",
-                          }}
-                          onClick={(e) => {
-                            setMostrarDialogUpdateRegalo(true);
-                            setModoDialogUpdateRegalo("DELETE");
-                            setRegaloSeleccionado(row);
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {regalos.map((row, i) => {
+                    console.log("row");
+                    console.log(row);
+                    return (
+                      <TableRow
+                        key={`${row?.id}-${i}`}
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                          backgroundColor:
+                            hoveredCell !== undefined
+                              ? hoveredCell === i
+                                ? "rgba(153, 0, 0, 0.2)"
+                                : "white"
+                              : "white",
+                        }}
+                        onMouseEnter={(e) => {
+                          setHoveredCell(i);
+                        }}
+                        onMouseLeave={(e) => {
+                          setHoveredCell(undefined);
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          {row.nombre}
+                        </TableCell>
+                        <TableCell>{row?.nombre_donacion}</TableCell>
+                        <TableCell>{row?.nombre_donador}</TableCell>
+                        <TableCell>{row?.imagen}</TableCell>
+                        <TableCell>
+                          <EditIcon
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            onClick={(e) => {
+                              setMostrarDialogUpdateRegalo(true);
+                              setModoDialogUpdateRegalo("EDIT");
+                              setRegaloSeleccionado(row);
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <DeleteForeverIcon
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            onClick={(e) => {
+                              setMostrarDialogUpdateRegalo(true);
+                              setModoDialogUpdateRegalo("DELETE");
+                              setRegaloSeleccionado(row);
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -249,6 +305,8 @@ const SeccionRegalos = (props) => {
         regaloSeleccionado={regaloSeleccionado}
         setCargando={setCargando}
         getRegalos={getRegalos}
+        tiposDeDonaciones={tiposDeDonaciones}
+        facultades={facultades}
       />
       <DialogUsarArchivoRegalo
         mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}

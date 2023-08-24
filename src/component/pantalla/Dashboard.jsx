@@ -21,7 +21,6 @@ import SeccionInicio from "../seccion/SeccionInicio";
 import SeccionSorteo from "../seccion/SeccionSorteo";
 import SeccionProfesores from "../seccion/SeccionProfesores";
 import SeccionRegalos from "../seccion/SeccionRegalos";
-import SeccionSorteos from "../seccion/SeccionSorteos";
 import SeccionUsuarios from "../seccion/SeccionUsuarios";
 import SeccionCatalogo from "../seccion/SeccionCatalogo";
 
@@ -227,11 +226,12 @@ export default function Dashboard(props) {
               ref={seccionContainerRef}
             >
               {seccion === "SeccionInicio" && <SeccionInicio />}
-              {seccion === "SeccionSorteo" && <SeccionSorteo />}
+              {seccion === "SeccionSorteo" && (
+                <SeccionSorteo setOpen={setOpen} />
+              )}
               {seccion === "SeccionProfesores" && <SeccionProfesores />}
               {seccion === "SeccionRegalos" && <SeccionRegalos />}
               {seccion === "SeccionUsuarios" && <SeccionUsuarios />}
-              {seccion === "SeccionSorteos" && <SeccionSorteos />}
               {seccion === "SeccionCatalogo" && <SeccionCatalogo />}
             </Container>
             <Grid

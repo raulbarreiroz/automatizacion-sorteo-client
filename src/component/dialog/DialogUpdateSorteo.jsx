@@ -12,10 +12,6 @@ import ErrorIcon from "@mui/icons-material/Error";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { useEffect, useState } from "react";
-import CheckBox from "@mui/icons-material/CheckBox";
-import ListItemText from "@mui/material/ListItemText";
-import Chip from "@mui/material/Chip";
-import DialogAdministrarProfesores from "./DialogAdministrarProfesores";
 
 const DialogUpdateSorteo = (props) => {
   const [profesores, setProfesores] = useState(undefined);
@@ -30,6 +26,7 @@ const DialogUpdateSorteo = (props) => {
   const [facultades, setFacultades] = useState(undefined);
   const [facultadesSeleccionadas, setFacultadesSeleccionadas] =
     useState(undefined);
+  const [agruparProfesoresPor, setAgruparProfesoresPor] = useState("facultad");
 
   const handleSubmit = (event) => {
     const crearSorteo = async () => {
@@ -118,11 +115,6 @@ const DialogUpdateSorteo = (props) => {
     else if (props?.modoDialogUpdateSorteo === "EDIT") actualizarSorteo();
     else if (props?.modoDialogUpdateSorteo === "DELETE") borrarSorteo();
   };
-
-  useEffect(() => {
-    console.log("updateSorteo props:");
-    console.log(props);
-  }, [props]);
 
   useEffect(() => {
     if (props?.sorteoSeleccionado?.profesores?.length) {
@@ -224,18 +216,41 @@ const DialogUpdateSorteo = (props) => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
+                <InputLabel required>AGRUPAR PROFESORES POR</InputLabel>
+                <Select
+                  variant="outlined"
+                  size="small"
+                  id="agruparProfesoresPor"
+                  name="agruparProfesoresPor"
+                  fullWidth
+                  value={agruparProfesoresPor}
+                  onChange={(e) => {
+                    setAgruparProfesoresPor(e?.target?.value);
+                  }}
+                >
+                  <MenuItem key={"facultadMenuItem"} value={"facultad"}>
+                    FACULTAD
+                  </MenuItem>
+                  <MenuItem key={"facultadMenuItem"} value={"ordenAleatorio"}>
+                    ORDEN ALEATORIO
+                  </MenuItem>
+                </Select>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <InputLabel required>REGALOS</InputLabel>
                 <Button
                   sm={12}
+                  type="submit"
                   style={{
                     backgroundColor: "#990000",
                     color: "white",
                     width: "100%",
                   }}
                   onClick={(e) => {
-                    setMostrarDialogAdministrarProfesores(true);
+                    e?.preventDefault();
                   }}
                 >
-                  ADMINISTRAR PROFESORES
+                  ASIGNAR
                 </Button>
               </Grid>
               <Grid
@@ -264,14 +279,6 @@ const DialogUpdateSorteo = (props) => {
           </Box>
         </DialogContent>
       </Dialog>
-      <DialogAdministrarProfesores
-        mostrarDialogAdministrarProfesores={mostrarDialogAdministrarProfesores}
-        setMostrarDialogAdministrarProfesores={
-          setMostrarDialogAdministrarProfesores
-        }
-        facultades={facultades}
-        profesores={profesores}
-      />
     </>
   );
 };

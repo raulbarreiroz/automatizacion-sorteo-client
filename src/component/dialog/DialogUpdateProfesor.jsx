@@ -11,8 +11,55 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
+import BuildIcon from "@mui/icons-material/Build";
+import { useEffect, useState } from "react";
 
 const DialogUpdateProfesor = (props) => {
+  const [textFieldCedula, setTextFieldCedula] = useState(undefined);
+  const [textFieldCedulaError, setTextFieldCedulaError] = useState(false);
+
+  useEffect(() => {
+    setTextFieldCedula(props?.profesorSeleccionado?.cedula || "");
+  }, [props]);
+
+  
+
+  useEffect(() => {
+    const modoDialogUpdateProfesor = props?.modoDialogUpdateProfesor;
+    const profesorSeleccionado = props?.profesorSeleccionado;
+
+    if (modoDialogUpdateProfesor === "ADD") {
+      if (
+        props?.cedulas?.filter((cedula) => cedula === textFieldCedula)?.length >
+        0
+      ) {
+        setTextFieldCedulaError(true);
+      } else {
+        setTextFieldCedulaError(false);
+      }
+    } else if (modoDialogUpdateProfesor === "EDIT") {
+      if (
+        props?.cedulas?.filter((cedula) => cedula === textFieldCedula)?.length >
+        0
+      ) {
+        if (profesorSeleccionado?.cedula !== textFieldCedula) {
+          setTextFieldCedulaError(true);
+        } else {
+          setTextFieldCedulaError(false);
+        }
+      } else {
+        setTextFieldCedulaError(false);
+      }
+    } else {
+      setTextFieldCedulaError(false);
+    }
+  }, [textFieldCedula, props]);
+
+  useEffect(() => {
+    console.log("textFieldCedulaError:");
+    console.log(textFieldCedulaError);
+  }, [textFieldCedulaError]);
+
   const handleSubmit = (event) => {
     const crearProfesor = async () => {
       const data = new FormData(event.currentTarget);
@@ -23,6 +70,13 @@ const DialogUpdateProfesor = (props) => {
       const apellido1 = data.get("apellido1");
       const apellido2 = data.get("apellido2");
 
+      console.log(cedula);
+      console.log(facultad);
+      console.log(nombre1);
+      console.log(nombre2);
+      console.log(apellido1);
+      console.log(apellido2);
+
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVERURL}/profesor`,
@@ -31,13 +85,11 @@ const DialogUpdateProfesor = (props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               cedula,
-              detalleId: facultad,
+              facultadId: facultad,
               nombre1,
               nombre2,
               apellido1,
-              apellido2,
-              cabeceraId: props?.cabeceraId,
-              creadoPor: "admin@test.com",
+              apellido2                           
             }),
           }
         );
@@ -66,12 +118,11 @@ const DialogUpdateProfesor = (props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               cedula,
-              detalleId: facultad,
+              facultadId: facultad,
               nombre1,
               nombre2,
               apellido1,
-              apellido2,
-              cabeceraId: props?.cabeceraId,
+              apellido2,              
             }),
           }
         );
@@ -171,41 +222,60 @@ const DialogUpdateProfesor = (props) => {
                 name="cedula"
                 autoComplete="cedula"
                 size="small"
-                defaultValue={props?.profesorSeleccionado?.cedula || ""}
-                disabled={
-                  props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                value={textFieldCedula}
+                onChange={(e) => {
+                  setTextFieldCedula(e?.target?.value);
+                }}
+                error={textFieldCedulaError}
+                helperText={
+                  textFieldCedulaError
+                    ? "OTRO PROFESOR YA TIENE REGISTRADA LA CÉDULA INGRESADA"
+                    : ""
                 }
+                disabled={
+                      props?.modoDialogUpdateProfesor === "DELETE"
+                        ? true
+                        : props?.facultades?.length
+                        ? false
+                        : true
+                    }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputLabel required>Facultad</InputLabel>
-              <Select
-                variant="outlined"
-                size="small"
-                id="facultad"
-                name="facultad"
-                fullWidth
-                defaultValue={
-                  props?.profesorSeleccionado?.detalle_id ||
-                  (props?.facultades?.length ? props?.facultades[0]?.id : -1)
-                }
-                disabled={
-                  props?.modoDialogUpdateProfesor === "DELETE"
-                    ? true
-                    : props?.facultades?.length
-                    ? false
-                    : true
-                }
-              >
-                {props?.facultades?.length &&
-                  props?.facultades?.map((facultad) => {
-                    return (
-                      <MenuItem key={facultad?.id} value={facultad?.id}>
-                        {facultad?.nombre}
-                      </MenuItem>
-                    );
-                  })}
-              </Select>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Select
+                    variant="outlined"
+                    size="small"
+                    id="facultad"
+                    name="facultad"
+                    fullWidth
+                    defaultValue={
+                      props?.profesorSeleccionado?.facultad_id ||
+                      (props?.facultades?.length
+                        ? props?.facultades[0]?.id
+                        : "")
+                    }
+                    disabled={
+                      props?.modoDialogUpdateProfesor === "DELETE"
+                        ? true
+                        : props?.facultades?.length
+                        ? false
+                        : true
+                    }
+                  >
+                    {props?.facultades?.length &&
+                      props?.facultades?.map((facultad) => {
+                        return (
+                          <MenuItem key={facultad?.id} value={facultad?.id}>
+                            {facultad?.nombre}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputLabel required>Primer nombre</InputLabel>
