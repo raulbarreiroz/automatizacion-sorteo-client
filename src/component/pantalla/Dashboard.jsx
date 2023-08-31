@@ -17,12 +17,14 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { mainListItems, secondaryListItems } from "../ListItems";
 import { useLocation } from "react-router-dom";
-import SeccionInicio from "../seccion/SeccionInicio";
 import SeccionSorteo from "../seccion/SeccionSorteo";
 import SeccionProfesores from "../seccion/SeccionProfesores";
 import SeccionRegalos from "../seccion/SeccionRegalos";
 import SeccionUsuarios from "../seccion/SeccionUsuarios";
-import SeccionCatalogo from "../seccion/SeccionCatalogo";
+import SeccionFacultades from "../seccion/SeccionFacultades";
+import SeccionCarreras from "../seccion/SeccionCarreras";
+import SeccionTipoDonacion from "../seccion/SeccionTipoDonacion";
+
 
 function Copyright(props) {
   return (
@@ -133,8 +135,14 @@ export default function Dashboard(props) {
   }, []);
 
   useEffect(() => {
-    setSeccion(props?.seccion);
+    setSeccion(props?.seccion);    
   }, [location, props?.seccion]);
+
+  useEffect(() => {
+    console.log('seccion: ')
+    console.log(seccion)
+    
+  }, [seccion])
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -224,15 +232,16 @@ export default function Dashboard(props) {
                 height: "96%",
               }}
               ref={seccionContainerRef}
-            >
-              {seccion === "SeccionInicio" && <SeccionInicio />}
+            >              
               {seccion === "SeccionSorteo" && (
                 <SeccionSorteo setOpen={setOpen} />
               )}
               {seccion === "SeccionProfesores" && <SeccionProfesores />}
               {seccion === "SeccionRegalos" && <SeccionRegalos />}
               {seccion === "SeccionUsuarios" && <SeccionUsuarios />}
-              {seccion === "SeccionCatalogo" && <SeccionCatalogo />}
+              {seccion === "SeccionFacultades" && <SeccionFacultades />}
+              {seccion === "SeccionCarreras" && <SeccionCarreras />}
+              {seccion === "SeccionTipoDonacion" && <SeccionTipoDonacion />}
             </Container>
             <Grid
               style={{

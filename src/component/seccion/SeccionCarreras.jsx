@@ -12,53 +12,37 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DialogUpdateProfesor from "../dialog/DialogUpdateProfesor";
+import DialogUpdateCarrera from "../dialog/DialogUpdateCarrera";
 import Carga from "../Carga";
-import DialogUsarArchivoProfesor from "../dialog/DialogUsarArchivoProfesor";
-import SaveAsIcon from "@mui/icons-material/SaveAs";
-import PublishIcon from "@mui/icons-material/Publish";
-import Visualizador from "../Visualizador";
-import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-
-const SeccionProfesores = (props) => {
+const SeccionCarreras = (props) => {
   const [cargando, setCargando] = useState(false);
   const gridBotones = useRef(undefined);
-  const [modoDialogUpdateProfesor, setModoDialogUpdateProfesor] =
+  const [modoDialogUpdateCarrera, setModoDialogUpdateCarrera] =
     useState(undefined);
   const [hoveredCell, setHoveredCell] = useState(undefined);
-  const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] =
+  const [mostrarDialogUpdateCarrera, setMostrarDialogUpdateCarrera] =
     useState(false);
-  const [mostrarDialogTableFacultad, setMostrarDialogTableFacultad] = useState(false)
-  const [mostrarDialogUsarArchivo, setMostrarDialogUsarArchivo] =
-    useState(false);
-  const [profesorSeleccionado, setProfesorSeleccionado] = useState(undefined);
-  const [profesores, setProfesores] = useState(undefined);
-  const [cabeceraId] = useState(12); // cabecera de catalogo de facultad
-  const [facultades, setFacultades] = useState(undefined);
-  const [cedulas, setCedulas] = useState(undefined);
-  const [mostrarVisualizador, setMostrarVisualizador] = useState(undefined)
-  const getProfesores = useCallback(async () => {
+  const [carreraSeleccionada, setCarreraSeleccionada] = useState(undefined);  
+  const [carreras, setCarreras] = useState(undefined)
+  const [facultades, setFacultades] = useState(undefined)
+  const getCarreras = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/profesores`
+        `${process.env.REACT_APP_SERVERURL}/carreras`
       );
-      const profesores = await response.json();
-
-      if (profesores?.length) {
-        setProfesores(profesores);
-        const cedulas = profesores?.map((profesor) => profesor?.cedula);
-        setCedulas(cedulas?.length ? cedulas : []);
+      const carreras = await response.json();
+      if (carreras?.length) {
+        setCarreras(carreras);
       } else {
-        setProfesores([]);
-        setCedulas([]);
+        setCarreras([]);
       }
     } catch (err) {
       console.log(err);
-      setProfesores([]);
-      setCedulas([]);
-    }
-    setCargando(false);
+      setCarreras([]);
+    }  
+    setCargando(false)
   }, []);
   const getFacultades = useCallback(async () => {
     try {
@@ -75,24 +59,24 @@ const SeccionProfesores = (props) => {
       console.log(err);
       setFacultades([]);
     }
-    setCargando(false);
+    setCargando(false)
   }, []);
-
-  useEffect(() => { 
-    console.log('profesorSleccionado: ')
-    console.log(profesorSeleccionado)
-  }, [profesorSeleccionado])
-
   useEffect(() => {
     setCargando(true);
-    getFacultades();
-    getProfesores();
-  }, [getProfesores, getFacultades]);
+    getFacultades()
+    getCarreras()
+    
+  }, [getCarreras, getFacultades]);
 
   useEffect(() => {
-    console.log("profesores: ");
-    console.log(profesores);
-  }, [profesores]);
+    console.log('carreras: ')
+    console.log(carreras)    
+  })
+
+  useEffect(() => {
+    console.log('facultades: ')
+    console.log(facultades)
+  })
 
   return (
     <>
@@ -113,29 +97,17 @@ const SeccionProfesores = (props) => {
                 endIcon={<AddIcon />}
                 sx={{ mb: 2 }}
                 onClick={(e) => {
-                  setMostrarDialogUpdateProfesor(true);
-                  setModoDialogUpdateProfesor("ADD");
-                  setProfesorSeleccionado(undefined);
+                  setMostrarDialogUpdateCarrera(true);
+                  setModoDialogUpdateCarrera("ADD");
+                  setCarreraSeleccionada(undefined);
                 }}
                 fullWidth
               >
-                Profesor
+                CARRERA
               </Button>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button
-                variant="outlined"
-                sx={{ mb: 2, ml: 2 }}
-                startIcon={<SaveAsIcon />}
-                endIcon={<PublishIcon />}
-                onClick={(e) => {
-                  setMostrarDialogUsarArchivo(true);
-                }}
-              >
-                Usar archivo
-              </Button>
-              </Grid>
-            </Grid>                    
+            
+            </Grid>                     
         </Grid>
 
         <Grid
@@ -143,10 +115,10 @@ const SeccionProfesores = (props) => {
           xs={12}
           style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: profesores?.length ? "scroll" : "hidden",
+            overflow: carreras?.length ? "scroll" : "hidden",
           }}
         >
-          {profesores?.length ? (
+          {carreras?.length ? (
             <TableContainer
               component={Paper}
               style={{
@@ -163,7 +135,7 @@ const SeccionProfesores = (props) => {
                         borderStartStartRadius: "5px",
                       }}
                     >
-                      Cédula
+                      Nombre
                     </TableCell>
                     <TableCell
                       style={{
@@ -171,7 +143,7 @@ const SeccionProfesores = (props) => {
                         color: "white",
                       }}
                     >
-                      Nombre completo
+                      DIRECTOR
                     </TableCell>
                     <TableCell
                       style={{
@@ -179,24 +151,8 @@ const SeccionProfesores = (props) => {
                         color: "white",
                       }}
                     >
-                      Facultad
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Imagen
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      ASISTIO
-                    </TableCell>
+                      FACULTAD
+                    </TableCell>                                  
                     <TableCell
                       style={{
                         backgroundColor: "rgb(153, 0, 0)",
@@ -219,12 +175,10 @@ const SeccionProfesores = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {profesores.map((row, i) => {          
-                    console.log(row?.imagen)                  
-                    
+                  {carreras.map((row, i) => {
                     return (
                       <TableRow
-                        key={`${row?.cedula}-${i}`}
+                        key={`${row?.id}-${i}`}
                         sx={{
                           "&:last-child td, &:last-child th": {
                             border: 0,
@@ -244,38 +198,19 @@ const SeccionProfesores = (props) => {
                         }}
                       >
                         <TableCell component="th" scope="row">
-                          {row.cedula}
+                          {row.nombre}
                         </TableCell>
-                        <TableCell>{`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}</TableCell>
-                        <TableCell>
-                          {
-                            facultades?.filter(
-                              (facultad) => facultad?.id === row?.facultad_id
-                            )[0]?.nombre
-                          }
-                        </TableCell>
-                        
-                        <TableCell>
-                          <img
-                            src={row?.imagen || imagenNoDisponible}
-                            alt="cargando"
-                            style={{
-                              width: '5vw',
-                              height: '5vw'
-                            }}
-                          />
-                          
-                        </TableCell>
-                        <TableCell>{ row?.asistio}</TableCell>
+                        <TableCell>{row.director }</TableCell>                       
+                        <TableCell>{row.facultad_id}</TableCell>                        
                         <TableCell>
                           <EditIcon
                             style={{
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateProfesor(true);
-                              setModoDialogUpdateProfesor("EDIT");
-                              setProfesorSeleccionado(row);
+                              setMostrarDialogUpdateCarrera(true);
+                              setModoDialogUpdateCarrera("EDIT");
+                              setCarreraSeleccionada(row);
                             }}
                           />
                         </TableCell>
@@ -285,9 +220,9 @@ const SeccionProfesores = (props) => {
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateProfesor(true);
-                              setModoDialogUpdateProfesor("DELETE");
-                              setProfesorSeleccionado(row);
+                              setMostrarDialogUpdateCarrera(true);
+                              setModoDialogUpdateCarrera("DELETE");
+                              setCarreraSeleccionada(row);
                             }}
                           />
                         </TableCell>
@@ -304,36 +239,26 @@ const SeccionProfesores = (props) => {
                 margin: "10px 0",
               }}
             >
-              No hay profesores registrados
+              NO HAY CARRERAS REGISTRADAS
             </div>
           )}
         </Grid>
       </Paper>
-      <DialogUpdateProfesor
-        mostrarDialogUpdateProfesor={mostrarDialogUpdateProfesor}
-        setMostrarDialogUpdateProfesor={setMostrarDialogUpdateProfesor}
-        modoDialogUpdateProfesor={modoDialogUpdateProfesor}
-        setModoDialogUpdateProfesor={setModoDialogUpdateProfesor}
-        profesorSeleccionado={profesorSeleccionado}
+      <DialogUpdateCarrera      
+        setMostrarDialogUpdateCarrera={setMostrarDialogUpdateCarrera}
+        mostrarDialogUpdateCarrera={mostrarDialogUpdateCarrera}
+        modoDialogUpdateCarrera={modoDialogUpdateCarrera}
+        setModoDialogUpdateCarrera={setModoDialogUpdateCarrera}
+        carreraSeleccionada={carreraSeleccionada}
+        carreras={carreras}
         facultades={facultades}
-        setCargando={setCargando}
-        getProfesores={getProfesores}
-        cabeceraId={cabeceraId}
-        cedulas={cedulas}
-      />
-      <DialogUsarArchivoProfesor
-        cedulas={cedulas}
-        mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
-        setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}
-        facultades={facultades}
-        cabeceraId={cabeceraId}
-        setCargando={setCargando}
-        getProfesores={getProfesores}
-      />
-      
+        getCarreras={getCarreras}
+        getFacultades={getFacultades}
+        setCargando={setCargando}        
+      />      
       <Carga cargando={cargando} />
     </>
   );
 };
 
-export default SeccionProfesores;
+export default SeccionCarreras;

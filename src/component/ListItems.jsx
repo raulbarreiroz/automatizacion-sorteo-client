@@ -8,8 +8,11 @@ import StorageIcon from "@mui/icons-material/Storage";
 import SchoolIcon from "@mui/icons-material/School";
 import RedeemIcon from "@mui/icons-material/Redeem";
 import SettingsIcon from "@mui/icons-material/Settings";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { NavLink } from "react-router-dom";
+import ReorderIcon from '@mui/icons-material/Reorder';
 
 const style = {
   color: "black",
@@ -17,15 +20,7 @@ const style = {
 };
 
 export const mainListItems = (
-  <React.Fragment>
-    <NavLink to="/dashboard/inicio" style={style}>
-      <ListItemButton>
-        <ListItemIcon>
-          <AppsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Inicio" />
-      </ListItemButton>
-    </NavLink>
+  <React.Fragment>    
     <NavLink to="/dashboard/sorteo" style={style}>
       <ListItemButton>
         <ListItemIcon>
@@ -47,6 +42,22 @@ export const secondaryListItems = (
         <ListItemText primary="Profesores" />
       </ListItemButton>
     </NavLink>
+    <NavLink to="/dashboard/facultades" style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <AccountBalanceIcon />
+        </ListItemIcon>
+        <ListItemText primary="Facultades" />
+      </ListItemButton>
+    </NavLink>
+    <NavLink to="/dashboard/carreras" style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <MenuBookIcon />
+        </ListItemIcon>
+        <ListItemText primary="Carreras" />
+      </ListItemButton>
+    </NavLink>
     <NavLink to="/dashboard/regalos" style={style}>
       <ListItemButton>
         <ListItemIcon>
@@ -55,20 +66,20 @@ export const secondaryListItems = (
         <ListItemText primary="Regalos" />
       </ListItemButton>
     </NavLink>
+    <NavLink to="/dashboard/tipoDonacion" style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <ReorderIcon />
+        </ListItemIcon>
+        <ListItemText primary="TiposDonaciones" />
+      </ListItemButton>
+    </NavLink>
     <NavLink to="/dashboard/usuarios" style={style}>
       <ListItemButton>
         <ListItemIcon>
           <AssignmentIndIcon />
         </ListItemIcon>
         <ListItemText primary="Usuarios" />
-      </ListItemButton>
-    </NavLink>
-    <NavLink to="/dashboard/catalogo" style={style}>
-      <ListItemButton>
-        <ListItemIcon>
-          <StorageIcon />
-        </ListItemIcon>
-        <ListItemText primary="Catalogo" />
       </ListItemButton>
     </NavLink>
   </React.Fragment>

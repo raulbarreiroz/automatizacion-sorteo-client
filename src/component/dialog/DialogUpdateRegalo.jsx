@@ -12,6 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Resizer from "react-image-file-resizer";
 
 const DialogUpdateRegalo = (props) => {
   const inputRef = useRef(undefined);
@@ -19,8 +20,39 @@ const DialogUpdateRegalo = (props) => {
   const [nombreDonador, setNombreDonador] = useState(undefined);
   const [tipoDonacionSeleccionada, setTipoDonacionSeleccionada] =
     useState(undefined);
+  const [tipoDeAutoridadSeleccionada, setTipoDeAutoridadSeleccionada] = useState(1)
   const [facultadSelccionada, setFacultadSeleccionada] = useState(undefined);
+  const [carreraSeleccionada, setCarreraSeleccionada] = useState(undefined)
   const a = useRef(undefined);
+  const [base64, setBase64] = useState(undefined)
+
+  useEffect(() => {
+    const resizeFile = (file) =>
+      new Promise((resolve) => {
+        Resizer.imageFileResizer(
+          file,
+          500,
+          500,
+          "JPEG",
+          80,
+          0,
+          (uri) => {
+            resolve(uri);
+          },
+          "base64"
+        );
+      });
+
+    const generateBase64 = async () => {
+      const base64 = await resizeFile(imagenSeleccionada)      
+      console.log(base64)
+      setBase64(base64)
+    }
+    
+    if (imagenSeleccionada) {
+      generateBase64()
+    }
+  }, [imagenSeleccionada])
 
   useEffect(() => {
     console.log("nombreDonador:");
@@ -60,6 +92,11 @@ const DialogUpdateRegalo = (props) => {
   ]);
 
   useEffect(() => {
+    console.log('carreras')
+    console.log(props?.carreras)
+  }, [props])
+
+  useEffect(() => {
     if (
       facultadSelccionada &&
       tipoDonacionSeleccionada &&
@@ -88,14 +125,14 @@ const DialogUpdateRegalo = (props) => {
     const crearRegalo = async () => {
       const data = new FormData(event.currentTarget);
       const nombre = data.get("nombre");
-      const imagen = data.get("imagen");
-
+            
       console.log(
         JSON.stringify({
           nombre,
           tipoDonacionId: tipoDonacionSeleccionada,
-          facultadId: tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
+          facultadId: tipoDonacionSeleccionada === 3 ? "-1" : facultadSelccionada,
           nombreDonador,
+          imagen: base64
         })
       );
 
@@ -109,8 +146,9 @@ const DialogUpdateRegalo = (props) => {
               nombre,
               tipoDonacionId: tipoDonacionSeleccionada,
               facultadId:
-                tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
+                tipoDonacionSeleccionada === 3 ? "-1" : facultadSelccionada,
               nombreDonador,
+              imagen: base64
             }),
           }
         );
@@ -125,8 +163,7 @@ const DialogUpdateRegalo = (props) => {
 
     const actualizarRegalo = async () => {
       const data = new FormData(event.currentTarget);
-      const nombre = data.get("nombre");
-      const imagen = data.get("imagen");
+      const nombre = data.get("nombre");      
       console.log(props?.regaloSeleccionado);
       try {
         const response = await fetch(
@@ -140,6 +177,7 @@ const DialogUpdateRegalo = (props) => {
               facultadId:
                 tipoDonacionSeleccionada === 3 ? "" : facultadSelccionada,
               nombreDonador,
+              
             }),
           }
         );
@@ -246,29 +284,53 @@ const DialogUpdateRegalo = (props) => {
                 }
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            
+            <Grid item xs={12} sm={3}>              
               <InputLabel>IMAGEN</InputLabel>
-              <input
-                accept=".jpg,.jpeg,.png"
-                style={{ display: "none" }}
-                id="raised-button-file"
-                type="file"
-                ref={inputRef}
-                onChange={(e) => {
-                  setImagenSeleccionda(inputRef?.current?.files["0"]);
-                }}
-              />
-              <label htmlFor="raised-button-file">
-                <Button
-                  style={{ padding: "6.5px 0" }}
-                  variant="outlined"
-                  component="span"
-                  fullWidth
-                >
-                  SELECCIONAR
-                </Button>
-              </label>
-            </Grid>
+              { !imagenSeleccionada?.name &&
+                <Grid item xs={12}>
+                  <input
+                    accept=".jpg,.jpeg,.png"
+                    style={{ display: "none" }}
+                    id="raised-button-file"
+                    type="file"
+                    ref={inputRef}
+                    onChange={(e) => {
+                      setImagenSeleccionda(inputRef?.current?.files["0"]);
+                    }}
+                    
+                  />
+                  <label htmlFor="raised-button-file">
+                    <Button
+                      style={{ padding: "6.5px 0" }}
+                      variant="outlined"
+                      component="span"
+                      fullWidth
+                    >
+                      SELECCIONAR
+                    </Button>
+                  </label>                  
+                </Grid>
+              }
+              { imagenSeleccionada?.name &&
+                <Grid item xs={12} alignItems={'center'} justifyContent={'space-between'} style={{ display: 'flex', paddingRight: 35 }}>
+                  <TextField size="small" style={{ width: '100%' }} required disabled value={imagenSeleccionada?.name} />
+                  {<CloseIcon
+                    onClick={e => {
+                      console.log(imagenSeleccionada?.name)
+                      setImagenSeleccionda(undefined)
+                    }}
+                    disabled={
+                      props?.modoDialogUpdateFacultad === "DELETE"
+                        ? true
+                        : false
+                        
+                    }
+                  />}
+                </Grid>
+              }
+            </Grid>  
+
             <Grid item xs={12} sm={6}>
               <InputLabel>TIPO DE DONACIÓN</InputLabel>
               {tipoDonacionSeleccionada && (
@@ -327,6 +389,67 @@ const DialogUpdateRegalo = (props) => {
                       return (
                         <MenuItem key={facultad?.id} value={facultad?.id}>
                           {facultad?.nombre}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>TIPO DE AUTORIDAD</InputLabel>
+              
+                <Select
+                  variant="outlined"
+                  size="small"
+                  id="tipoDeAutoridad"
+                  name="tipoDeAutoridad"
+                  fullWidth
+                  inputRef={a}
+                  value={tipoDeAutoridadSeleccionada}
+                  onChange={(e) => {
+                    setTipoDeAutoridadSeleccionada(e?.target?.value);
+                  }}
+                  disabled={
+                    props?.modoDialogUpdateRegalo === "DELETE" ? true : false
+                  }
+                >
+                  {[{id: 1, nombre: 'DIRECTOR'}, {id: 2, nombre:'DECANO'}]?.map((tipoDeAutoridad) => {
+                      return (
+                        <MenuItem
+                          key={tipoDeAutoridad?.id}
+                          value={tipoDeAutoridad?.id}
+                        >
+                          {tipoDeAutoridad?.nombre}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+              
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel>SELECCIONE CARRERA</InputLabel>
+              {props?.carreras?.length && (
+                <Select
+                  variant="outlined"
+                  size="small"
+                  id="carrera"
+                  name="carrera"
+                  fullWidth
+                  value={carreraSeleccionada}
+                  onChange={(e) => {
+                    setCarreraSeleccionada(e?.target?.value);
+                  }}
+                  disabled={
+                    tipoDeAutoridadSeleccionada === 2
+                      ? true
+                     : false
+                  }
+                >
+                  {props?.carreras?.length &&
+                    props?.carreras?.filter(carrera => carrera?.facultad_id === facultadSelccionada)?.map((carrera) => {
+                      return (
+                        <MenuItem key={carrera?.id} value={carrera?.id}>
+                          {carrera?.nombre}
                         </MenuItem>
                       );
                     })}

@@ -76,7 +76,21 @@ const App = () => {
             element={<Dashboard seccion="SeccionCatalogo" />}
             path="dashboard/catalogo"
           ></Route>
-          <Route path="*" element={<PaginaNoEncontrada />} />
+          <Route
+            index
+            element={<Dashboard seccion="SeccionFacultades" />}
+            path="dashboard/facultades"
+          ></Route>
+          <Route
+            index
+            element={<Dashboard seccion="SeccionCarreras" />}
+            path="dashboard/carreras"
+          ></Route>
+          <Route
+            index
+            element={<Dashboard seccion="SeccionTipoDonacion" />}
+            path="dashboard/tipoDonacion"
+          ></Route>
           <Route
             path="dashboard/*"
             element={<Dashboard seccion="SeccionInicio" />}

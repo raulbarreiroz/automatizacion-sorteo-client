@@ -12,67 +12,24 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DialogUpdateRegalo from "../dialog/DialogUpdateRegalo";
+import DialogUpdateFacultad from "../dialog/DialogUpdateFacultad";
 import Carga from "../Carga";
-import DialogUsarArchivoRegalo from "../dialog/DialogUsarArchivoRegalo";
-import SaveAsIcon from "@mui/icons-material/SaveAs";
-import PublishIcon from "@mui/icons-material/Publish";
-import Resizer from "react-image-file-resizer";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
 
-const SeccionRegalos = (props) => {
+
+const SeccionFacultades = (props) => {
   const [cargando, setCargando] = useState(false);
   const gridBotones = useRef(undefined);
-  const [modoDialogUpdateRegalo, setModoDialogUpdateRegalo] =
+  const [modoDialogUpdateFacultad, setModoDialogUpdateFacultad] =
     useState(undefined);
   const [hoveredCell, setHoveredCell] = useState(undefined);
-  const [mostrarDialogUpdateRegalo, setMostrarDialogUpdateRegalo] =
+  const [mostrarDialogUpdateFacultad, setMostrarDialogUpdateFacultad] =
     useState(false);
-  const [mostrarDialogUsarArchivo, setMostrarDialogUsarArchivo] =
-    useState(false);
-  const [regaloSeleccionado, setRegaloSeleccionado] = useState(undefined);
-  const [regalos, setRegalos] = useState(undefined);
-  const [tiposDeDonaciones, setTiposDeDonaciones] = useState(undefined);
-  const [donadosPor, setDonadosPor] = useState(undefined);
+  const [facultadSeleccionado, setFacultadSeleccionado] = useState(undefined);
   const [facultades, setFacultades] = useState(undefined);
-  const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
-  const [base64, setBase64] = useState(undefined)
   const [carreras, setCarreras] = useState(undefined)
-  const getRegalos = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/regalos`
-      );
-      const regalos = await response.json();
-
-      if (regalos?.length) {
-        setRegalos(regalos);
-      } else {
-        setRegalos([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setRegalos([]);
-    }
-    setCargando(false);
-  }, []);
-  const getTiposDeDonaciones = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/tiposDeDonaciones`
-      );
-      const tiposDeDonaciones = await response.json();
-
-      if (tiposDeDonaciones?.length) {
-        setTiposDeDonaciones(tiposDeDonaciones);
-      } else {
-        setTiposDeDonaciones([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setTiposDeDonaciones([]);
-    }
-  }, []);
+  const [decanos, setDecanos] = useState(undefined)
   const getFacultades = useCallback(async () => {
     try {
       const response = await fetch(
@@ -88,11 +45,29 @@ const SeccionRegalos = (props) => {
       console.log(err);
       setFacultades([]);
     }
+    setCargando(false)
   }, []);
-  const getCarreras = useCallback(async () => {
+  const getDecanos = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/carreras`
+        `${process.env.REACT_APP_SERVERURL}/decanos`
+      );
+      const decanos = await response.json();
+      if (decanos?.length) {
+        setDecanos(decanos);
+      } else {
+        setDecanos([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setDecanos([]);
+    }
+    setCargando(false)
+  }, []);
+  const getCarrerasSinFacultades = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/carreras-sin-facultades`
       );
       const carreras = await response.json();
       if (carreras?.length) {
@@ -103,41 +78,32 @@ const SeccionRegalos = (props) => {
     } catch (err) {
       console.log(err);
       setCarreras([]);
-    }
+    }  
+    setCargando(false)
   }, []);
+
   useEffect(() => {
     setCargando(true);
-    getTiposDeDonaciones();
-    getCarreras()
+    getCarrerasSinFacultades()
+    getDecanos()
     getFacultades();
-    getRegalos();
-  }, [getRegalos, getTiposDeDonaciones, getFacultades, getCarreras]);
+  }, [getFacultades, getCarrerasSinFacultades, getDecanos]);
 
   useEffect(() => {
-    console.log("regalos");
-    console.log(regalos);
-  }, [regalos]);
+    console.log('hola')
+    console.log('faculteades: ')
+    console.log(facultades)
+  }, [facultades])
 
   useEffect(() => {
-    if (regaloSeleccionado) {
-      if (tiposDeDonaciones) {
-        setDonadosPor(
-          tiposDeDonaciones?.filter(
-            (tipoDeDonacion) =>
-              tipoDeDonacion?.id === regaloSeleccionado?.tipo_donacion_id
-          )[0]?.donado_por
-        );
-      } else {
-        setDonadosPor([]);
-      }
-    } else {
-      if (tiposDeDonaciones) {
-        setDonadosPor(tiposDeDonaciones[0]?.donado_por);
-      } else {
-        setDonadosPor([]);
-      }
-    }
-  }, [regaloSeleccionado, tiposDeDonaciones]);
+    console.log('decnaos')
+    console.log(decanos)
+  }, [decanos])
+
+  useEffect(() => {
+    console.log('carreras: ')
+    console.log(carreras)    
+  })
 
   return (
     <>
@@ -148,48 +114,45 @@ const SeccionRegalos = (props) => {
           padding: "2.5vh 1.5vw",
         }}
       >
-        <Grid ref={gridBotones}>
-          <Button
-            variant="outlined"
-            startIcon={<SchoolIcon />}
-            endIcon={<AddIcon />}
-            sx={{ mb: 2 }}
-            onClick={(e) => {
-              setMostrarDialogUpdateRegalo(true);
-              setModoDialogUpdateRegalo("ADD");
-              setRegaloSeleccionado(undefined);
-            }}
-          >
-            Regalo
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{ mb: 2, ml: 2 }}
-            startIcon={<SaveAsIcon />}
-            endIcon={<PublishIcon />}
-            onClick={(e) => {
-              setMostrarDialogUsarArchivo(true);
-            }}
-          >
-            Usar archivo
-          </Button>
+        <Grid  width={'100%'} ref={gridBotones} container justifyContent={"flex-start"}>
+          
+          <Grid container item xs={6}>
+            <Grid item xs={12} sm={5}>
+              <Button
+                variant="outlined"
+                startIcon={<SchoolIcon />}
+                endIcon={<AddIcon />}
+                sx={{ mb: 2 }}
+                onClick={(e) => {
+                  setMostrarDialogUpdateFacultad(true);
+                  setModoDialogUpdateFacultad("ADD");
+                  setFacultadSeleccionado(undefined);
+                }}
+                fullWidth
+              >
+                Facultad
+              </Button>
+            </Grid>
+            
+            </Grid>                     
         </Grid>
+
         <Grid
           item
           xs={12}
           style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: regalos?.length ? "scroll" : "hidden",
+            overflow: facultades?.length ? "scroll" : "hidden",
           }}
         >
-          {regalos?.length ? (
+          {facultades?.length ? (
             <TableContainer
               component={Paper}
               style={{
                 overflowX: "initial",
               }}
             >
-              <Table aria-label="tabla de Regalos" stickyHeader>
+              <Table aria-label="tabla de profesores" stickyHeader>
                 <TableHead>
                   <TableRow>
                     <TableCell
@@ -199,7 +162,7 @@ const SeccionRegalos = (props) => {
                         borderStartStartRadius: "5px",
                       }}
                     >
-                      NOMBRE
+                      Nombre
                     </TableCell>
                     <TableCell
                       style={{
@@ -207,7 +170,7 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      TIPO DONACIÓN
+                      Color
                     </TableCell>
                     <TableCell
                       style={{
@@ -215,7 +178,7 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      DONADO POR
+                      Logo
                     </TableCell>
                     <TableCell
                       style={{
@@ -223,7 +186,15 @@ const SeccionRegalos = (props) => {
                         color: "white",
                       }}
                     >
-                      IMAGEN
+                      Carreras
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",
+                      }}
+                    >
+                      Decano
                     </TableCell>
                     <TableCell
                       style={{
@@ -247,9 +218,10 @@ const SeccionRegalos = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {regalos.map((row, i) => {
-                    console.log("row");
-                    console.log(row);
+                  {facultades.map((row, i) => {
+                    console.log(row)
+                    console.log(decanos)
+                    console.log(decanos?.filter(decano => decano?.id === row?.decano_id))
                     return (
                       <TableRow
                         key={`${row?.id}-${i}`}
@@ -274,25 +246,28 @@ const SeccionRegalos = (props) => {
                         <TableCell component="th" scope="row">
                           {row.nombre}
                         </TableCell>
-                        <TableCell>{row?.nombre_donacion}</TableCell>
-                        <TableCell>{row?.nombre_donador}</TableCell>
-                        <TableCell>{<img
-                            src={row?.imagen || imagenNoDisponible}
+                        <TableCell>{row.color }</TableCell>
+                        <TableCell>
+                        <img
+                            src={row?.logo || imagenNoDisponible}
                             alt="cargando"
                             style={{
                               width: '5vw',
                               height: '5vw'
                             }}
-                          />}</TableCell>
+                          />
+                        </TableCell>
+                        <TableCell>{row.carreras?.map(carrera => carrera?.nombre)?.join(',')}</TableCell>
+                        <TableCell>{decanos?.filter(decano => decano?.id === row?.decano_id)[0]?.nombre}</TableCell>
                         <TableCell>
                           <EditIcon
                             style={{
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateRegalo(true);
-                              setModoDialogUpdateRegalo("EDIT");
-                              setRegaloSeleccionado(row);
+                              setMostrarDialogUpdateFacultad(true);
+                              setModoDialogUpdateFacultad("EDIT");
+                              setFacultadSeleccionado(row);
                             }}
                           />
                         </TableCell>
@@ -302,9 +277,9 @@ const SeccionRegalos = (props) => {
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateRegalo(true);
-                              setModoDialogUpdateRegalo("DELETE");
-                              setRegaloSeleccionado(row);
+                              setMostrarDialogUpdateFacultad(true);
+                              setModoDialogUpdateFacultad("DELETE");
+                              setFacultadSeleccionado(row);
                             }}
                           />
                         </TableCell>
@@ -321,32 +296,25 @@ const SeccionRegalos = (props) => {
                 margin: "10px 0",
               }}
             >
-              No hay Regalos registrados
+              NO HAY FACULTADES REGISTRADAS
             </div>
           )}
         </Grid>
       </Paper>
-      <DialogUpdateRegalo
-        mostrarDialogUpdateRegalo={mostrarDialogUpdateRegalo}
-        setMostrarDialogUpdateRegalo={setMostrarDialogUpdateRegalo}
-        modoDialogUpdateRegalo={modoDialogUpdateRegalo}
-        setModoDialogUpdateRegalo={setModoDialogUpdateRegalo}
-        regaloSeleccionado={regaloSeleccionado}
-        setCargando={setCargando}
-        getRegalos={getRegalos}
+      <DialogUpdateFacultad        
+        setMostrarDialogUpdateFacultad={setMostrarDialogUpdateFacultad}
+        mostrarDialogUpdateFacultad={mostrarDialogUpdateFacultad}
+        modoDialogUpdateFacultad={modoDialogUpdateFacultad}
+        setModoDialogUpdateFacultad={setModoDialogUpdateFacultad}
+        facultadSeleccionado={facultadSeleccionado}
         carreras={carreras}
-        tiposDeDonaciones={tiposDeDonaciones}
-        facultades={facultades}
-      />
-      <DialogUsarArchivoRegalo
-        mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
-        setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}
-        setCargando={setCargando}
-        getRegalos={getRegalos}
-      />
+        getFacultades={getFacultades}    
+        getDecanos={getDecanos}
+        setCargando={setCargando}        
+      />      
       <Carga cargando={cargando} />
     </>
   );
 };
 
-export default SeccionRegalos;
+export default SeccionFacultades;

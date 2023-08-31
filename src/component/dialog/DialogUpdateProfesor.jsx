@@ -11,18 +11,20 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
-import BuildIcon from "@mui/icons-material/Build";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Resizer from "react-image-file-resizer";
+import {decode as base64_decode, encode as base64_encode} from 'base-64';
 
 const DialogUpdateProfesor = (props) => {
+  const inputRef = useRef(undefined);
+  const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
   const [textFieldCedula, setTextFieldCedula] = useState(undefined);
   const [textFieldCedulaError, setTextFieldCedulaError] = useState(false);
+  const [base64, setBase64] = useState(undefined)
 
   useEffect(() => {
     setTextFieldCedula(props?.profesorSeleccionado?.cedula || "");
   }, [props]);
-
-  
 
   useEffect(() => {
     const modoDialogUpdateProfesor = props?.modoDialogUpdateProfesor;
@@ -60,6 +62,34 @@ const DialogUpdateProfesor = (props) => {
     console.log(textFieldCedulaError);
   }, [textFieldCedulaError]);
 
+  useEffect(() => {
+    const resizeFile = (file) =>
+      new Promise((resolve) => {
+        Resizer.imageFileResizer(
+          file,
+          500,
+          500,
+          "JPEG",
+          80,
+          0,
+          (uri) => {
+            resolve(uri);
+          },
+          "base64"
+        );
+      });
+
+    const generateBase64 = async () => {
+      const base64 = await resizeFile(imagenSeleccionada)      
+      console.log(base64)
+      setBase64(base64)
+    }
+    
+    if (imagenSeleccionada) {
+      generateBase64()
+    }
+  }, [imagenSeleccionada])
+
   const handleSubmit = (event) => {
     const crearProfesor = async () => {
       const data = new FormData(event.currentTarget);
@@ -89,12 +119,14 @@ const DialogUpdateProfesor = (props) => {
               nombre1,
               nombre2,
               apellido1,
-              apellido2                           
+              apellido2,
+              imagen: base64
             }),
           }
         );
         if (response.status === 200) {
           props?.setMostrarDialogUpdateProfesor(false);
+          setImagenSeleccionda(undefined)
           props?.getProfesores();
         }
       } catch (err) {
@@ -112,7 +144,7 @@ const DialogUpdateProfesor = (props) => {
       const apellido2 = data.get("apellido2");
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.id}`,
+          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.cedula}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -122,12 +154,15 @@ const DialogUpdateProfesor = (props) => {
               nombre1,
               nombre2,
               apellido1,
-              apellido2,              
+              apellido2,    
+              imagen: base64,
+              asistio: props?.profesorSeleccionado?.asistio
             }),
           }
         );
         if (response.status === 200) {
           props?.setMostrarDialogUpdateProfesor(false);
+          setImagenSeleccionda(undefined)
           props?.getProfesores();
         }
       } catch (err) {
@@ -138,7 +173,7 @@ const DialogUpdateProfesor = (props) => {
     const borrarProfesor = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.id}`,
+          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.cedula}`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -146,6 +181,7 @@ const DialogUpdateProfesor = (props) => {
         );
         if (response.status === 200) {
           props?.setMostrarDialogUpdateProfesor(false);
+          setImagenSeleccionda(undefined)
           props?.getProfesores();
         }
       } catch (err) {
@@ -200,6 +236,7 @@ const DialogUpdateProfesor = (props) => {
         <Button
           onClick={(e) => {
             props?.setMostrarDialogUpdateProfesor(false);
+            setImagenSeleccionda(undefined)
           }}
         >
           <CloseIcon />
@@ -234,14 +271,58 @@ const DialogUpdateProfesor = (props) => {
                 }
                 disabled={
                       props?.modoDialogUpdateProfesor === "DELETE"
-                        ? true
-                        : props?.facultades?.length
-                        ? false
-                        : true
+                        ? true                        
+                        : false
+                        
                     }
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6}>              
+              <InputLabel>IMAGEN</InputLabel>
+              { !imagenSeleccionada?.name &&
+                <Grid item xs={12}>
+                  <input
+                    accept=".jpg,.jpeg,.png"
+                    style={{ display: "none" }}
+                    id="raised-button-file"
+                    type="file"
+                    ref={inputRef}
+                    onChange={(e) => {
+                      setImagenSeleccionda(inputRef?.current?.files["0"]);
+                    }}
+                    
+                  />
+                  <label htmlFor="raised-button-file">
+                    <Button
+                      style={{ padding: "6.5px 0" }}
+                      variant="outlined"
+                      component="span"
+                      fullWidth
+                    >
+                      SELECCIONAR
+                    </Button>
+                  </label>                  
+                </Grid>
+              }
+              { imagenSeleccionada?.name &&
+                <Grid item xs={12} alignItems={'center'} justifyContent={'space-between'} style={{ display: 'flex', paddingRight: 35 }}>
+                  <TextField size="small" style={{ width: '100%' }} required disabled value={imagenSeleccionada?.name} />
+                  {<CloseIcon
+                    onClick={e => {
+                      console.log(imagenSeleccionada?.name)
+                      setImagenSeleccionda(undefined)
+                    }}
+                    disabled={
+                      props?.modoDialogUpdateFacultad === "DELETE"
+                        ? true
+                        : false
+                        
+                    }
+                  />}
+                </Grid>
+              }
+            </Grid>  
+            <Grid item xs={12} sm={12}>
               <InputLabel required>Facultad</InputLabel>
               <Grid container>
                 <Grid item xs={12}>
