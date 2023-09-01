@@ -20,18 +20,11 @@ const DialogUpdateCarrera = (props) => {
   const [facultades, setFacultades] = useState(undefined)
   const [facultadSeleccionada, setFacultadSeleccionada] = useState(false)
 
-  useEffect(() => {
-    console.log('facultades: ')
-    console.log(props?.facultades)
-  }, [props])
-
-  useEffect(() => {
-    console.log('facultadSeleccionada')
-    console.log(facultadSeleccionada)
-  }, [facultadSeleccionada])
-
-  useEffect(() => {
+  useEffect(() => {    
     const facultades = props?.facultades
+    const carreraSeleccionada = props?.carreraSeleccionada
+    const directores = props?.directores
+    
     if (facultades?.length) {
       setFacultades(facultades)
       
@@ -40,6 +33,28 @@ const DialogUpdateCarrera = (props) => {
       setFacultades([])
       setFacultadSeleccionada('')
     } 
+
+    if (carreraSeleccionada) {      
+      if (carreraSeleccionada?.nombre) {
+        setTextFieldNombre(carreraSeleccionada?.nombre)
+      } else {
+        setTextFieldNombre('')
+      }
+      if (carreraSeleccionada?.facultad_id && facultades) {
+        setFacultadSeleccionada(facultades?.filter(facultad => facultad?.id === carreraSeleccionada?.facultad_id)[0]?.id)
+      } else {
+        setFacultadSeleccionada('')
+      }
+      if (carreraSeleccionada && directores) {
+        setTextFieldDirector(directores?.filter(director => director?.id === carreraSeleccionada?.director_id)[0]?.nombre)
+      } else {
+        setTextFieldDirector('')
+      }
+    } else {
+      console.log('create')
+      setTextFieldDirector('')
+      setTextFieldNombre('')
+    }
   }, [props])
  
   const handleSubmit = (event) => {      
@@ -48,7 +63,7 @@ const DialogUpdateCarrera = (props) => {
         console.log({
               nombre: textFieldNombre,
               directorNombre: textFieldDirector,
-              facultad_id: facultadSeleccionada
+              facultadId: facultadSeleccionada
             })
 
         const response = await fetch(
@@ -59,13 +74,14 @@ const DialogUpdateCarrera = (props) => {
             body: JSON.stringify({
               nombre: textFieldNombre,
               directorNombre: textFieldDirector,
-              facultad_id: facultadSeleccionada
+              facultadId: facultadSeleccionada
             })
           }
         );
         if (response.status === 200) {
           props?.setMostrarDialogUpdateCarrera(false);
           props?.getCarreras();
+          props?.getDirectores()
         }
       } catch (err) {
         console.log(err);
@@ -82,13 +98,14 @@ const DialogUpdateCarrera = (props) => {
             body: JSON.stringify({
               nombre: textFieldNombre,
               directorNombre: textFieldDirector,
-              facultad_id: facultadSeleccionada
+              facultadId: facultadSeleccionada
             }),
           }
         );
         if (response.status === 200) {
           props?.setMostrarDialogUpdateCarrera(false);
           props?.getCarreras();
+          props?.getDirectores()
         }
       } catch (err) {
         console.log(err);
@@ -107,6 +124,7 @@ const DialogUpdateCarrera = (props) => {
         if (response.status === 200) {
           props?.setMostrarDialogUpdateCarrera(false);
           props?.getCarreras();
+          props?.getDirectores()
         }
       } catch (err) {
         console.log(err);
@@ -256,9 +274,9 @@ const DialogUpdateCarrera = (props) => {
                   width: "100%",
                 }}
               >
-                {props?.modoDialogUpdateFacultad === "ADD"
+                {props?.modoDialogUpdateCarrera === "ADD"
                   ? "GUARDAR"
-                  : props?.modoDialogUpdateFacultad === "EDIT"
+                  : props?.modoDialogUpdateCarrera === "EDIT"
                   ? "EDITAR"
                   : "ELIMINAR"}
               </Button>

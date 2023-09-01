@@ -15,7 +15,7 @@ import { SketchPicker } from 'react-color'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Resizer from "react-image-file-resizer";
-
+import Avatar from "@mui/material/Avatar"
 
 const DialogUpdateFacultad = (props) => {
   const inputRef = useRef(undefined);
@@ -52,11 +52,35 @@ const DialogUpdateFacultad = (props) => {
   const [carreras, setCarreras] = useState(undefined)
 
   useEffect(() => {
+    console.log('props')
+    console.log(props)
+  }, [props])
+
+  useEffect(() => {
     if (props) {
       const carreras = props?.carreras
+      const facultadSeleccionada = props?.facultadSeleccionado
+      const decanos = props?.decanos
       console.log(props)
-      setTextFieldNombre(props?.facultadSeleccionado?.nombre || "");
+      
+      setTextFieldNombre(facultadSeleccionada?.nombre?.trim() || "");
+     
+      setBase64(facultadSeleccionada?.logo || '')
+      
+      if (facultadSeleccionada?.color)
+        setColor({ hex: facultadSeleccionada?.color?.trim() })
+      
       setTextFieldDecanoNombre('')
+
+      if (facultadSeleccionada?.decano_id && decanos) {
+       
+        const decanosFiltrados = decanos?.filter(decano => decano?.id === facultadSeleccionada?.decano_id)[0]?.nombre
+        console.log(decanosFiltrados)
+        setTextFieldDecanoNombre(decanosFiltrados?.length ? decanosFiltrados : '')
+      } else {
+        setTextFieldDecanoNombre('')
+      }
+
       if (carreras?.length) {
         setCarreras(carreras?.map((carrera) => ({
           ...carrera,
@@ -70,42 +94,6 @@ const DialogUpdateFacultad = (props) => {
       setCarreras([])
     }
   }, [props]);
-
-  useEffect(() => {
-    const modoDialogUpdateFacultad = props?.modoDialogUpdateFacultad;
-    const facultadSeleccionado = props?.facultadSeleccionado;
-
-    if (modoDialogUpdateFacultad === "ADD") {
-      if (
-        props?.cedulas?.filter((cedula) => cedula === textFieldNombre)?.length >
-        0
-      ) {
-        setTextFieldNombreError(true);
-      } else {
-        setTextFieldNombreError(false);
-      }
-    } else if (modoDialogUpdateFacultad === "EDIT") {
-      if (
-        props?.cedulas?.filter((cedula) => cedula === textFieldNombre)?.length >
-        0
-      ) {
-        if (facultadSeleccionado?.cedula !== textFieldNombre) {
-          setTextFieldNombreError(true);
-        } else {
-          setTextFieldNombreError(false);
-        }
-      } else {
-        setTextFieldNombreError(false);
-      }
-    } else {
-      setTextFieldNombreError(false);
-    }
-  }, [textFieldNombre, props]);
-
-  useEffect(() => {
-    console.log("textFieldNombreError:");
-    console.log(textFieldNombreError);
-  }, [textFieldNombreError]);
 
   useEffect(() => {
     //let encoded =
@@ -137,11 +125,6 @@ const DialogUpdateFacultad = (props) => {
     }
   }, [imagenSeleccionada])
 
-  useEffect(() => {
-    console.log('base64')
-    console.log(base64)
-  }, [base64])
-
   const handleSubmit = (event) => {      
     const crearFacultad = async () => {
       try {             
@@ -170,6 +153,7 @@ const DialogUpdateFacultad = (props) => {
     };
 
     const actualizarFacultad = async () => {      
+      console.log(props?.facultadSeleccionado?.decano_id,)
       try {
         console.log(props?.facultadSeleccionado)
         const response = await fetch(
@@ -182,6 +166,8 @@ const DialogUpdateFacultad = (props) => {
               'decanoNombre': textFieldDecanoNombre,
               'color': color?.hex,            
               'carreras': carreras?.filter(carrera => carrera?.seleccionada),
+              decanoFacultadId: props?.facultadSeleccionada?.decano_id,
+              logo: base64
             }),
           }
         );
@@ -348,7 +334,7 @@ const DialogUpdateFacultad = (props) => {
                 }}
               />}
             </Grid>
-            <Grid item xs={12} sm={6}>              
+            <Grid item xs={12} sm={6} >              
               <InputLabel>LOGO</InputLabel>
               { !imagenSeleccionada?.name &&
                 <Grid item xs={12}>
@@ -369,6 +355,12 @@ const DialogUpdateFacultad = (props) => {
                       variant="outlined"
                       component="span"
                       fullWidth
+                      disabled={
+                        props?.modoDialogUpdateFacultad === "DELETE"
+                          ? true
+                          : false
+                          
+                      }
                     >
                       SELECCIONAR
                     </Button>
@@ -382,6 +374,7 @@ const DialogUpdateFacultad = (props) => {
                     onClick={e => {
                       console.log(imagenSeleccionada?.name)
                       setImagenSeleccionda(undefined)
+                      setBase64(undefined)
                     }}
                     disabled={
                       props?.modoDialogUpdateFacultad === "DELETE"
@@ -392,7 +385,17 @@ const DialogUpdateFacultad = (props) => {
                   />}
                 </Grid>
               }
-            </Grid>            
+            </Grid> 
+            { base64 &&
+              <Grid container item xs={12} justifyContent={'center'} style={{ padding: 0, height: '30%', marginTop: 5 }}>
+                <Avatar
+                  variant="rounded"
+                  sx={{ width: "80%", height: "60%", }}
+                  src={base64}
+                  alt="logo-aso"
+                />
+              </Grid>
+            }
             <Grid item xs={12}>
               <InputLabel style={{ textAlign: 'center' }}>{carreras?.length > 0 ? 'CARRERAS(click en carrera para seleccionar' : 'NO HAY CARRERAS REGISTRADAS'}</InputLabel>                
                 <Grid item xs={12} >

@@ -310,6 +310,7 @@ const SeccionFacultades = (props) => {
         carreras={carreras}
         getFacultades={getFacultades}    
         getDecanos={getDecanos}
+        decanos={decanos}
         setCargando={setCargando}        
       />      
       <Carga cargando={cargando} />

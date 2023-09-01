@@ -13,7 +13,8 @@ import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useEffect, useState, useRef } from "react";
 import Resizer from "react-image-file-resizer";
-import {decode as base64_decode, encode as base64_encode} from 'base-64';
+import { decode as base64_decode, encode as base64_encode } from 'base-64';
+import Avatar from "@mui/material/Avatar"
 
 const DialogUpdateProfesor = (props) => {
   const inputRef = useRef(undefined);
@@ -24,6 +25,7 @@ const DialogUpdateProfesor = (props) => {
 
   useEffect(() => {
     setTextFieldCedula(props?.profesorSeleccionado?.cedula || "");
+    setBase64(props?.profesorSeleccionado?.imagen || '')
   }, [props]);
 
   useEffect(() => {
@@ -298,6 +300,12 @@ const DialogUpdateProfesor = (props) => {
                       variant="outlined"
                       component="span"
                       fullWidth
+                      disabled={
+                        props?.modoDialogUpdateProfesor === "DELETE"
+                          ? true                        
+                          : false
+                          
+                      }
                     >
                       SELECCIONAR
                     </Button>
@@ -311,6 +319,7 @@ const DialogUpdateProfesor = (props) => {
                     onClick={e => {
                       console.log(imagenSeleccionada?.name)
                       setImagenSeleccionda(undefined)
+                      setBase64(undefined)
                     }}
                     disabled={
                       props?.modoDialogUpdateFacultad === "DELETE"
@@ -322,10 +331,21 @@ const DialogUpdateProfesor = (props) => {
                 </Grid>
               }
             </Grid>  
+            { base64 &&
+              <Grid container item xs={12} justifyContent={'center'} style={{ padding: 0, height: '30%', marginTop: 5 }}>
+                <Avatar
+                  variant="rounded"
+                  sx={{ width: "80%", height: "60%", }}
+                  src={base64}
+                  alt="logo-aso"
+                />
+              </Grid>
+            }
             <Grid item xs={12} sm={12}>
               <InputLabel required>Facultad</InputLabel>
               <Grid container>
                 <Grid item xs={12}>
+                  {props?.facultades && props?.facultades?.length > 0 &&
                   <Select
                     variant="outlined"
                     size="small"
@@ -354,7 +374,7 @@ const DialogUpdateProfesor = (props) => {
                           </MenuItem>
                         );
                       })}
-                  </Select>
+                  </Select>}
                 </Grid>
               </Grid>
             </Grid>

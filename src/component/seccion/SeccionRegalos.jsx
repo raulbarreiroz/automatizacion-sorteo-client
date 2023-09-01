@@ -37,7 +37,9 @@ const SeccionRegalos = (props) => {
   const [facultades, setFacultades] = useState(undefined);
   const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
   const [base64, setBase64] = useState(undefined)
+  const [decanos, setDecanos] = useState(undefined)
   const [carreras, setCarreras] = useState(undefined)
+  const [directores, setDirectores] = useState(undefined)
   const getRegalos = useCallback(async () => {
     try {
       const response = await fetch(
@@ -105,13 +107,48 @@ const SeccionRegalos = (props) => {
       setCarreras([]);
     }
   }, []);
+  const getDecanos = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/decanos`
+      );
+      const decanos = await response.json();
+      if (decanos?.length) {
+        setDecanos(decanos);
+      } else {
+        setDecanos([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setDecanos([]);
+    }
+    setCargando(false)
+  }, []);
+  const getDirectores = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/directores`
+      );
+      const facultades = await response.json();
+      if (facultades?.length) {
+        setDirectores(facultades);
+      } else {
+        setDirectores([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setDirectores([]);
+    }    
+  }, []);
   useEffect(() => {
     setCargando(true);
     getTiposDeDonaciones();
     getCarreras()
     getFacultades();
+    getDecanos()
+    getDirectores()
     getRegalos();
-  }, [getRegalos, getTiposDeDonaciones, getFacultades, getCarreras]);
+  }, [getRegalos, getTiposDeDonaciones, getFacultades, getCarreras, getDecanos, getDirectores]);
 
   useEffect(() => {
     console.log("regalos");
@@ -162,6 +199,7 @@ const SeccionRegalos = (props) => {
           >
             Regalo
           </Button>
+          {/*
           <Button
             variant="outlined"
             sx={{ mb: 2, ml: 2 }}
@@ -173,6 +211,7 @@ const SeccionRegalos = (props) => {
           >
             Usar archivo
           </Button>
+          */}
         </Grid>
         <Grid
           item
@@ -337,6 +376,8 @@ const SeccionRegalos = (props) => {
         carreras={carreras}
         tiposDeDonaciones={tiposDeDonaciones}
         facultades={facultades}
+        decanos={decanos}
+        directores={directores}
       />
       <DialogUsarArchivoRegalo
         mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}

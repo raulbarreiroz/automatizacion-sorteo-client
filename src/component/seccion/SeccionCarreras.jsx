@@ -14,7 +14,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DialogUpdateCarrera from "../dialog/DialogUpdateCarrera";
 import Carga from "../Carga";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const SeccionCarreras = (props) => {
   const [cargando, setCargando] = useState(false);
@@ -27,6 +26,7 @@ const SeccionCarreras = (props) => {
   const [carreraSeleccionada, setCarreraSeleccionada] = useState(undefined);  
   const [carreras, setCarreras] = useState(undefined)
   const [facultades, setFacultades] = useState(undefined)
+  const [directores, setDirectores] = useState(undefined)
   const getCarreras = useCallback(async () => {
     try {
       const response = await fetch(
@@ -61,12 +61,30 @@ const SeccionCarreras = (props) => {
     }
     setCargando(false)
   }, []);
+  const getDirectores = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/directores`
+      );
+      const facultades = await response.json();
+      if (facultades?.length) {
+        setDirectores(facultades);
+      } else {
+        setDirectores([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setDirectores([]);
+    }    
+  }, []);
+
   useEffect(() => {
     setCargando(true);
     getFacultades()
+    getDirectores()
     getCarreras()
     
-  }, [getCarreras, getFacultades]);
+  }, [getCarreras, getFacultades, getDirectores]);
 
   useEffect(() => {
     console.log('carreras: ')
@@ -77,6 +95,11 @@ const SeccionCarreras = (props) => {
     console.log('facultades: ')
     console.log(facultades)
   })
+
+  useEffect(() => {
+    console.log('directores: ')
+    console.log(directores)
+  }, [directores])
 
   return (
     <>
@@ -200,8 +223,8 @@ const SeccionCarreras = (props) => {
                         <TableCell component="th" scope="row">
                           {row.nombre}
                         </TableCell>
-                        <TableCell>{row.director }</TableCell>                       
-                        <TableCell>{row.facultad_id}</TableCell>                        
+                        <TableCell>{directores ? directores?.filter(director => director?.carrera_id === row?.id)[0]?.nombre : ''}</TableCell>                       
+                        <TableCell>{facultades ? facultades?.filter(facultad => facultad?.id === row?.facultad_id)[0]?.nombre : ''}</TableCell>                        
                         <TableCell>
                           <EditIcon
                             style={{
@@ -252,9 +275,10 @@ const SeccionCarreras = (props) => {
         carreraSeleccionada={carreraSeleccionada}
         carreras={carreras}
         facultades={facultades}
-        getCarreras={getCarreras}
-        getFacultades={getFacultades}
-        setCargando={setCargando}        
+        directores={directores}
+        getCarreras={getCarreras}        
+        getDirectores={getDirectores}
+        setCargando={setCargando}           
       />      
       <Carga cargando={cargando} />
     </>

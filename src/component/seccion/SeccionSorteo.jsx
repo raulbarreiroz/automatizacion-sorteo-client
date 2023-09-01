@@ -36,6 +36,7 @@ const SeccionSorteo = (props) => {
   const [openasistencia, setOpenAsistencia] = useState(undefined)
   const [hoveredCell, setHoveredCell] = useState(undefined);
   const [profesores, setProfesores] = useState(undefined)
+  const [nombreRegalos, setNombreRegalos] = useState(undefined)
   const getFacultades = useCallback(async () => {
     try {
       const response = await fetch(
@@ -77,6 +78,7 @@ const SeccionSorteo = (props) => {
     setCargando(false);
   }, []);
 
+  
   const getRegalos = useCallback(async () => {
     try {
       const response = await fetch(
@@ -94,6 +96,33 @@ const SeccionSorteo = (props) => {
       setRegalos([]);
     }
   }, []);
+
+  const getNombreRegalos = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/nombre-regalos`
+      );
+      const regalos = await response.json();
+
+      if (regalos?.length) {
+        setNombreRegalos(regalos);
+      } else {
+        setNombreRegalos([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setNombreRegalos([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      getRegalos()
+      getNombreRegalos()
+      getFacultades()
+    }
+  }, [open, getFacultades, getRegalos, getNombreRegalos])
+
 
   useEffect(() => {
     console.log('tipodDEonacionSelecionado')
@@ -119,15 +148,22 @@ const SeccionSorteo = (props) => {
   }, []);
 
   useState(() => {
+    getFacultades()
     getProfesores()
-  }, [getProfesores])
+  }, [getProfesores, getFacultades])
 
   useEffect(() => {
     setCargando(true);
     getRegalos();    
+    getNombreRegalos()
     getTiposDeDonaciones();
     getFacultades();
-  }, [getFacultades, getRegalos, getTiposDeDonaciones]);
+  }, [getFacultades, getRegalos, getTiposDeDonaciones, getNombreRegalos]);
+
+  useEffect(() => {
+    console.log('nombreRegalos')
+    console.log(nombreRegalos)
+  }, [nombreRegalos])
 
   useEffect(() => {
     if (tiposDeDonaciones?.length && facultades?.length && regalos?.length) {
@@ -236,18 +272,12 @@ const SeccionSorteo = (props) => {
                       ? props?.facultades[0]?.id
                       : "")
                   }
-                  disabled={
-                    props?.modoDialogUpdateProfesor === "DELETE"
-                      ? true
-                      : props?.facultades?.length
-                        ? false
-                        : true
-                  }
+                  
                 >
-                  {regalos?.length &&
-                    regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado )?.map((regalo) => {
+                  {nombreRegalos?.length &&
+                    nombreRegalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado )?.map((regalo) => {
                       return (
-                        <MenuItem key={regalo?.id} value={regalo?.id}>
+                        <MenuItem key={regalo?.nombre} value={regalo?.nombre}>
                           {regalo?.nombre}
                         </MenuItem>
                       );
@@ -271,12 +301,12 @@ const SeccionSorteo = (props) => {
                         
                         const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado && 
                           regalo?.facultad_id === facultad?.id)
-                        
-                        if (r?.length > 0) {
+                        const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
+                        console.log(facultad?.profesores)
+                        if (r?.length > 0 && p?.length > 0) {
                           console.log('regalos: ')
                           console.log(r)
                           console.log('profesores')
-                          const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
                           console.log(p)
 
                           const indiceRegaloSeleccionado = getRandomInt(r?.length)
@@ -375,6 +405,9 @@ const SeccionSorteo = (props) => {
                             />
                             <Grid container justifyContent={'space-around'}>
                             <Typography fontSize={12.5}  style={{
+                                  color: facultad?.color || 'black'
+                              }}>PROFESORES RESTANTES : {facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)?.length || 0}</Typography>
+                              <Typography fontSize={12.5} style={{
                                   color: facultad?.color || 'black'
                               }}>REGALOS RESTANTES : {regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado && 
                                 regalo?.facultad_id === facultad?.id)?.length }</Typography>
@@ -577,14 +610,11 @@ const SeccionSorteo = (props) => {
                   asignarProfesor(s)
                   asignarRegalo(s)
                 }
-                setCargando(false)  
+                
                 
               
-              setSorteo([])
-              
-              getFacultades()
-              getRegalos()
-                setOpen(false)
+              setSorteo([])                          
+              setOpen(false)             
               }}
                     >
                     CONTINUAR
@@ -678,6 +708,7 @@ const SeccionSorteo = (props) => {
                                   );
                                   if (response.status === 200) {
                                     getProfesores();
+                                    getFacultades()
                                     setCargando(false)
                                   }
                                 } catch (err) {
@@ -719,6 +750,7 @@ const SeccionSorteo = (props) => {
                                   );
                                   if (response.status === 200) {
                                     getProfesores();
+                                    getFacultades()
                                     setCargando(false)
                                   }
                                 } catch (err) {
