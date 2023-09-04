@@ -118,7 +118,11 @@ const DialogUpdateRegalo = (props) => {
     props?.facultades,
   ]);
 
-  
+  useEffect(() => {
+    console.log('props: ')
+    console.log(props)
+  }, [props])
+
   const handleSubmit = (event) => {
     const crearRegalo = async (nombre, tipoDonacionId, facultadId, nombreDonador, imagen) => {                  
       console.log(
@@ -231,7 +235,7 @@ const DialogUpdateRegalo = (props) => {
           }
         } else {
           for (let i = 0; i < cantidad; i++) {
-            await crearRegalo(nombre, tipoDonacionSeleccionada, facultadSelccionada, nombreDonador, base64)
+            await crearRegalo(nombre, tipoDonacionSeleccionada, -1, nombreDonador, base64)
           }
         }
       }
@@ -532,8 +536,8 @@ const DialogUpdateRegalo = (props) => {
                 </Grid>
             }
             { (tipoDonacionSeleccionada === 3) &&
-              (sortearPor === 2 ? props?.facultades?.length && props?.facultades?.map((facultad, id) => {
-                return (<Grid item xs={12} sm={6}>
+              (sortearPor === 2 ? 
+                 (<Grid item xs={12} sm={6}>
                   <InputLabel>Cantidad de objetos</InputLabel>
                   <TextField
                     size="small"
@@ -546,8 +550,8 @@ const DialogUpdateRegalo = (props) => {
                       props?.modoDialogUpdateRegalo === "DELETE" ? true : false
                     }
                   />
-                </Grid>)
-              }) : props?.facultades?.length && props?.facultades?.map((facultad, id) => {
+                </Grid>
+              ) : props?.facultades?.length && props?.facultades?.map((facultad, id) => {
                 return (<Grid item xs={12} sm={6}>
                   <InputLabel>{facultad?.nombre}</InputLabel>
                   <TextField
@@ -582,9 +586,8 @@ const DialogUpdateRegalo = (props) => {
                 </Grid>)
               })
             }
-            { (tipoDonacionSeleccionada === 1) &&
-              props?.facultades?.length && props?.facultades?.map((facultad, id) => {
-                return (<Grid item xs={12} sm={6}>
+            { (tipoDonacionSeleccionada === 1 && props?.modoDialogUpdateRegalo === 'ADD') &&              
+                (<Grid item xs={12} sm={6}>
                   <InputLabel>Cantidad de objetos</InputLabel>
                   <TextField
                     size="small"
@@ -598,8 +601,8 @@ const DialogUpdateRegalo = (props) => {
                     }
                   />
                 </Grid>)
-              })
-            }                   
+              }
+                             
             <Grid container item xs={12} sm={12} justifyContent={"center"}>
               <InputLabel>DONACIÓN DE: {nombreDonador}</InputLabel>
             </Grid>

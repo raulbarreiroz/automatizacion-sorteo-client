@@ -63,8 +63,8 @@ const SeccionTipoDonacion = (props) => {
       >
         <Grid  width={'100%'} ref={gridBotones} container justifyContent={"flex-start"}>
           
-          <Grid container item xs={6}>
-            <Grid item xs={12} sm={5}>
+          <Grid container item xs={12}>
+            <Grid item xs={12} sm={4}>
               <Button
                 variant="outlined"
                 startIcon={<SchoolIcon />}

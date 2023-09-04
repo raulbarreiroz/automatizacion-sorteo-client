@@ -19,20 +19,26 @@ import Grid from "@mui/material/Grid";
 import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import EditIcon from "@mui/icons-material/Edit";
 import MenuItem from "@mui/material/MenuItem";
+import { Co2Sharp } from "@mui/icons-material";
 
 const DialogEditarRegistroProfesor = (props) => {
   const [mensajesSeleccionados, setMensajesSeleccionado] = useState(undefined);
-  const [campo, setCampo] = useState("");
-  const [cedulasRepetidasEnArchivo, setCedulasRepetidasEnArchivo] =
-    useState(undefined);
-
+  const [campo, setCampo] = useState("");  
   useEffect(() => {
+    console.log('campo')
+    console.log(campo)
+  }, [campo])
+  
+  useEffect(() => {
+    console.log('props')
+    console.log(props)
+
     if (props?.rowSeleccionado) {
       setCampo(
         props?.rowSeleccionado[props?.campoPorEditarDialogEditarRegistro]
-          ?.valor || ""
+          ?.valor || props?.facultades[0]?.id
       );
-    }
+    } 
   }, [props]);
 
   useEffect(() => {
@@ -206,13 +212,13 @@ const DialogEditarRegistroProfesor = (props) => {
                 }}
               >
                 {props?.facultades?.map((facultad) => {
+                  console.log('campo: ', campo)
+                  console.log('facultad')
+                  console.log(facultad)
                   return (
                     <MenuItem
                       key={`$${facultad?.id}-{facultad?.cabecera_id}-${facultad?.detalle_id}`}
-                      value={facultad?.id}
-                      onChange={(e) => {
-                        setCampo(e?.target?.value);
-                      }}
+                      value={facultad?.id}                      
                     >
                       {facultad?.nombre}
                     </MenuItem>

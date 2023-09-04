@@ -23,9 +23,9 @@ const DialogUpdateProfesor = (props) => {
   const [textFieldCedulaError, setTextFieldCedulaError] = useState(false);
   const [base64, setBase64] = useState(undefined)
 
-  useEffect(() => {
+  useEffect(() => {    
     setTextFieldCedula(props?.profesorSeleccionado?.cedula || "");
-    setBase64(props?.profesorSeleccionado?.imagen || '')
+    setBase64(props?.profesorSeleccionado?.imagen || '')    
   }, [props]);
 
   useEffect(() => {
@@ -58,12 +58,7 @@ const DialogUpdateProfesor = (props) => {
       setTextFieldCedulaError(false);
     }
   }, [textFieldCedula, props]);
-
-  useEffect(() => {
-    console.log("textFieldCedulaError:");
-    console.log(textFieldCedulaError);
-  }, [textFieldCedulaError]);
-
+  
   useEffect(() => {
     const resizeFile = (file) =>
       new Promise((resolve) => {
@@ -83,7 +78,7 @@ const DialogUpdateProfesor = (props) => {
 
     const generateBase64 = async () => {
       const base64 = await resizeFile(imagenSeleccionada)      
-      console.log(base64)
+    
       setBase64(base64)
     }
     
@@ -101,13 +96,6 @@ const DialogUpdateProfesor = (props) => {
       const nombre2 = data.get("nombre2");
       const apellido1 = data.get("apellido1");
       const apellido2 = data.get("apellido2");
-
-      console.log(cedula);
-      console.log(facultad);
-      console.log(nombre1);
-      console.log(nombre2);
-      console.log(apellido1);
-      console.log(apellido2);
 
       try {
         const response = await fetch(
@@ -316,8 +304,7 @@ const DialogUpdateProfesor = (props) => {
                 <Grid item xs={12} alignItems={'center'} justifyContent={'space-between'} style={{ display: 'flex', paddingRight: 35 }}>
                   <TextField size="small" style={{ width: '100%' }} required disabled value={imagenSeleccionada?.name} />
                   {<CloseIcon
-                    onClick={e => {
-                      console.log(imagenSeleccionada?.name)
+                    onClick={e => {                    
                       setImagenSeleccionda(undefined)
                       setBase64(undefined)
                     }}
@@ -335,7 +322,7 @@ const DialogUpdateProfesor = (props) => {
               <Grid container item xs={12} justifyContent={'center'} style={{ padding: 0, height: '30%', marginTop: 5 }}>
                 <Avatar
                   variant="rounded"
-                  sx={{ width: "80%", height: "60%", }}
+                  sx={{ width: "30%", height: "30%", borderRadius: '50%' }}
                   src={base64}
                   alt="logo-aso"
                 />

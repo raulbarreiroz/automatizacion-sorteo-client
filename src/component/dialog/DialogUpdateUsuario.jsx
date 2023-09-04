@@ -11,8 +11,16 @@ import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+
 
 const DialogUpdateUsuario = (props) => {
+  const [, setCookie] = useCookies(null);
+  const navigate = useNavigate();
+
+
+
   const handleSubmit = (event) => {
     const crearUsuario = async () => {
       const data = new FormData(event.currentTarget);
@@ -20,23 +28,47 @@ const DialogUpdateUsuario = (props) => {
       const pwd = data?.get("pwd");
       const alias = data?.get("alias");
       const rol = data?.get("rol");
+
+      console.log('email', email)
+      console.log('pwd', pwd)
+      console.log('alias', alias)
+      console.log('rol', rol)
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/usuario`,
+          `${process.env.REACT_APP_SERVERURL}/gestor`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email,
               pwd,
-              alias,
-              cabeceraId: props?.cabeceraId,
-              detalleId: rol,
-              creadoPor: "admin@test.com",
+              alias,                                        
             }),
           }
         );
         if (response.status === 200) {
+          console.log('hola')
+          const usuario = await response?.json()
+          
+          console.log('usuario')
+          console.log(usuario)
+          
+          if (usuario) {
+            console.log(usuario?.severity)
+            console.log(usuario?.message)
+
+            if (usuario?.email && usuario?.token) {
+              setCookie('EMAIL', usuario?.email)
+              setCookie('TOKEN', usuario?.token)
+              setCookie('ALIAS', usuario?.alias)
+              setCookie('ROL_ID', usuario?.rolId)
+              navigate('/dashboard/inicio')
+            }
+
+            props?.setSeverity(usuario?.severity)
+            props?.setMessage(usuario?.message)
+          }
+
           props?.setMostrarDialogUpdateUsuario(false);
           props?.getUsuarios();
         }
@@ -206,6 +238,7 @@ const DialogUpdateUsuario = (props) => {
                 }
               />
             </Grid>
+           
             <Grid item xs={12} sm={6}>
               <InputLabel required>Facultad</InputLabel>
               <Select
@@ -221,13 +254,11 @@ const DialogUpdateUsuario = (props) => {
                 disabled={
                   props?.modoDialogUpdateUsuario === "DELETE"
                     ? true
-                    : props?.roles?.length
-                    ? false
-                    : true
+                    : false
                 }
               >
-                {props?.roles?.length &&
-                  props?.roles?.map((rol) => {
+                {
+                  [{id: 1, nombre: 'ADMINISTRADOR'}, {id: 2, nombre:"GESTOR DE SORTEO"}]?.map((rol) => {
                     return (
                       <MenuItem key={rol?.id} value={rol?.id}>
                         {rol?.nombre}
@@ -236,6 +267,7 @@ const DialogUpdateUsuario = (props) => {
                   })}
               </Select>
             </Grid>
+                
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
               <Button
                 sm={12}

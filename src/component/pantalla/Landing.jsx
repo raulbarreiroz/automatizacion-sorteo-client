@@ -13,6 +13,8 @@ import DialogCrearUsuario from "../dialog/DialogCrearUsuario";
 import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
 import aso from "../../resources/imagen/aso.jpg";
+import Carga from "../Carga";
+import { useCookies } from "react-cookie";
 
 function Copyright(props) {
   return (
@@ -36,25 +38,67 @@ function Copyright(props) {
 
 const defaultTheme = createTheme({});
 
-export default function IniciarSesion() {
+export default function Landing(props) {
   const navigate = useNavigate();
   const [mostrarDialogCrearUsuario, setMostrarDialogCrearUsuario] =
-    useState(false);
+    useState(false);    
+  const [cargando, setCargando] = useState(undefined)
+  const [, setCookie] = useCookies(null);
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get("email");
-    const pwd = data.get("pwd");
-    if (email === "admin@test.com" && pwd === "1234") {
-      console.log("usuario puede ingresar");
-      navigate("dashboard/inicio");
-    } else if (email !== "admin@test.com") {
-      console.log("usuario incorrecta");
-    } else if (email === "admin@test.com" && pwd !== "1234") {
-      console.log("contraseña incorrecta ");
-    }
-  };
+    event.preventDefault();   
+    
+    const iniciarSesion = async () => {
+      const data = new FormData(event.currentTarget);
+      const email = data.get("email");
+      const pwd = data.get("pwd");            
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVERURL}/iniciar-sesion`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email, pwd
+            }),
+          }
+        );
+        if (response.status === 200) {
+          const usuario = await response?.json()
+          
+          console.log('usuario')
+          console.log(usuario)
+          
+          if (usuario) {
+            console.log(usuario?.severity)
+            console.log(usuario?.message)
+
+            if (usuario?.email && usuario?.token) {
+              setCookie('EMAIL', usuario?.email)
+              setCookie('TOKEN', usuario?.token)
+              setCookie('ALIAS', usuario?.alias)
+              setCookie('ROL_ID', usuario?.rolId)
+              navigate('/dashboard/inicio')
+            }
+
+            props?.setSeverity(usuario?.severity)
+            props?.setMessage(usuario?.message)
+          }
+        } else {
+          
+        }
+      } catch (err) {
+        console.log(err);
+        setCargando(false)
+      }
+      setCargando(false)
+      props?.setOpenSnackBar(true)
+    };
+
+    setCargando(true)
+    iniciarSesion()    
+  };  
 
   return (
     <>
@@ -150,6 +194,7 @@ export default function IniciarSesion() {
         mostrarDialogCrearUsuario={mostrarDialogCrearUsuario}
         setMostrarDialogCrearUsuario={setMostrarDialogCrearUsuario}
       />
+      <Carga cargando={cargando} />      
     </>
   );
 }

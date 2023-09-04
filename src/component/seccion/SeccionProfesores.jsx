@@ -19,7 +19,7 @@ import SaveAsIcon from "@mui/icons-material/SaveAs";
 import PublishIcon from "@mui/icons-material/Publish";
 import Visualizador from "../Visualizador";
 import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
-
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const SeccionProfesores = (props) => {
   const [cargando, setCargando] = useState(false);
@@ -77,22 +77,12 @@ const SeccionProfesores = (props) => {
     }
     setCargando(false);
   }, []);
-
-  useEffect(() => { 
-    console.log('profesorSleccionado: ')
-    console.log(profesorSeleccionado)
-  }, [profesorSeleccionado])
-
+  
   useEffect(() => {
     setCargando(true);
     getFacultades();
     getProfesores();
   }, [getProfesores, getFacultades]);
-
-  useEffect(() => {
-    console.log("profesores: ");
-    console.log(profesores);
-  }, [profesores]);
 
   return (
     <>
@@ -105,8 +95,8 @@ const SeccionProfesores = (props) => {
       >
         <Grid  width={'100%'} ref={gridBotones} container justifyContent={"flex-start"}>
           
-          <Grid container item xs={6}>
-            <Grid item xs={12} sm={5}>
+          <Grid container item xs={12}>
+            <Grid item xs={12} sm={4} md={2}>
               <Button
                 variant="outlined"
                 startIcon={<SchoolIcon />}
@@ -219,9 +209,7 @@ const SeccionProfesores = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {profesores.map((row, i) => {          
-                    console.log(row?.imagen)                  
-                    
+                  {profesores.map((row, i) => {
                     return (
                       <TableRow
                         key={`${row?.cedula}-${i}`}
@@ -256,14 +244,18 @@ const SeccionProfesores = (props) => {
                         </TableCell>
                         
                         <TableCell>
-                          <img
-                            src={row?.imagen || imagenNoDisponible}
-                            alt="cargando"
-                            style={{
-                              width: '5vw',
-                              height: '5vw'
-                            }}
-                          />
+                          {row?.imagen ?
+                            <img
+                              src={row?.imagen}
+                              alt="cargando"
+                              style={{
+                                width: '5vw',
+                                height: '5vw',
+                                borderRadius: '50%'
+                              }}
+                            /> : <AccountCircleIcon style={{width: '5vw',
+                            height: '5vw',}} />
+                          }
                           
                         </TableCell>
                         <TableCell>{ row?.asistio}</TableCell>

@@ -396,6 +396,7 @@ const DialogUpdateFacultad = (props) => {
                 />
               </Grid>
             }
+            {/*
             <Grid item xs={12}>
               <InputLabel style={{ textAlign: 'center' }}>{carreras?.length > 0 ? 'CARRERAS(click en carrera para seleccionar' : 'NO HAY CARRERAS REGISTRADAS'}</InputLabel>                
                 <Grid item xs={12} >
@@ -439,7 +440,8 @@ const DialogUpdateFacultad = (props) => {
                 }
                 </Grid>
               
-            </Grid>            
+            </Grid>    
+              */}
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
               <Button
                 sm={12}

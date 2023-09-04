@@ -1,102 +1,285 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import IniciarSesion from "./component/pantalla/IniciarSecion";
+import Landing from "./component/pantalla/Landing";
 import Dashboard from "./component/pantalla/Dashboard";
 import PaginaNoEncontrada from "./component/pantalla/PaginaNoEncontrada";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import * as React from "react";
+import { useCookies } from "react-cookie";
 
 const App = () => {
-  const [usuarios, setUsuarios] = useState([]);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [severity, setSeverity] = useState(undefined);
+  const [message, setMessage] = useState(undefined);
+  const [cookies] = useCookies(null);
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
 
-  useEffect(() => {
-    const getUsuarios = async () => {
-      //console.log("getting usuarios");
-      try {
-        /*
-        const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/usuarios`
-        );
-        
-        //console.log(`${process.env.REACT_APP_SERVERURL}/usuarios`);
-        const json = await response.json();
-        //console.log(json);
-        if (response.status === 200) {
-          setUsuarios(json);
-        } else {
-          setUsuarios([]);
-        }
-        */
-      } catch (err) {
-        //console.log(err);
-        //console.log("para la proxima campeon");
-        setUsuarios([]);
-      }
-    };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
-    getUsuarios();
-  }, []);
+    setOpenSnackBar(false);
+  };
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route index element={<IniciarSesion />} path="/"></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionInicio" />}
+            element={
+              !cookies?.EMAIL &&
+              !cookies?.TOKEN &&
+              !cookies?.ALIAS &&
+              !cookies?.ROL_ID && (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
+          />
+          <Route
+            index
+            element={
+              cookies?.EMAIL &&
+              cookies?.TOKEN &&
+              cookies?.ALIAS &&
+              cookies?.ROL_ID ? (
+                <Dashboard
+                  seccion="SeccionInicio"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/inicio"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionSorteo" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionSorteo"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/sorteo"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionProfesores" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionProfesores"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/profesores"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionRegalos" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionRegalos"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/regalos"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionUsuarios" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionUsuarios"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/usuarios"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionSorteos" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionSorteos"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/sorteos"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionCatalogo" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionCatalogo"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/catalogo"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionFacultades" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionFacultades"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/facultades"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionCarreras" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionCarreras"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/carreras"
           ></Route>
           <Route
             index
-            element={<Dashboard seccion="SeccionTipoDonacion" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionTipoDonacion"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
             path="dashboard/tipoDonacion"
           ></Route>
           <Route
             path="dashboard/*"
-            element={<Dashboard seccion="SeccionInicio" />}
+            element={
+              cookies?.EMAIL && cookies?.TOKEN ? (
+                <Dashboard
+                  seccion="SeccionInicio"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
           ></Route>
         </Routes>
       </BrowserRouter>
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        key={"top right"}
+      >
+        <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

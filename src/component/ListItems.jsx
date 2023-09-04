@@ -13,6 +13,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { NavLink } from "react-router-dom";
 import ReorderIcon from '@mui/icons-material/Reorder';
+import HomeIcon from '@mui/icons-material/Home';
+import { Home } from "@mui/icons-material";
 
 const style = {
   color: "black",
@@ -21,6 +23,14 @@ const style = {
 
 export const mainListItems = (
   <React.Fragment>    
+    <NavLink to="/dashboard/inicio" style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <HomeIcon />
+        </ListItemIcon>
+        <ListItemText primary="Inicio" />
+      </ListItemButton>
+    </NavLink>
     <NavLink to="/dashboard/sorteo" style={style}>
       <ListItemButton>
         <ListItemIcon>

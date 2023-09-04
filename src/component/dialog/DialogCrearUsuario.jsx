@@ -1,7 +1,5 @@
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import {useEffect} from 'react'
@@ -12,16 +10,49 @@ import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import { useNavigate } from "react-router-dom";
 
 const DialogCrearUsuario = (props) => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const navigate = useNavigate();
+
+  const handleSubmit = (event) => {    
+    const crearUsuario = async () => {
+      event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    const email = data.get('email')
+    const alias = data.get('alias')
+    const pwd = data.get('pwd')    
+
+    console.log(email)
+    console.log(alias)
+    console.log(pwd)
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVERURL}/usuario`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              alias,
+              pwd,
+              rolId: 2
+            }),
+          }
+        );
+        props?.setMostrarDialogCrearUsuario(false)
+        if (response.status === 200) {
+          navigate("dashboard/inicio");
+        } else {          
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    crearUsuario()
+  }
 
   return (
     <Dialog

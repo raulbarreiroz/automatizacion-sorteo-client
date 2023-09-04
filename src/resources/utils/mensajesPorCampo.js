@@ -10,7 +10,8 @@ const mensajeCedulaRegistradaConOtroProfesor =
   "El número de cédula no debe estar registrado con otro profesor";
 const mensajeCedulaRegistradaEnOtraFila =
   "El número de cédula no debe estar registrada en otra fila";
-const validadorCampoObligatorio = (campo) => campo && campo?.trim() !== "";
+const validadorCampoObligatorio = (campo) =>
+  campo && campo?.toString()?.trim() !== "";
 const validadorCampoConLongitudDeCampo = (campo, longitud) =>
   campo && campo?.trim()?.length === longitud;
 const validadorCampoSoloNumeros = (campo) =>
@@ -26,7 +27,7 @@ const validadorCampoSoloLetras = (campo) => {
   );
 };
 const validadorCampoEnLista = (id, lista) =>
-  !lista?.length || !id ? false : lista?.filter((el) => el === id);
+  !lista?.length || !id || id === "" ? false : lista?.filter((el) => el === id);
 
 export const mensajesPorCampoProfesor = [
   {

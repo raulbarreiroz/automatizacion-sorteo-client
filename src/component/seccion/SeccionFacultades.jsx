@@ -16,6 +16,7 @@ import DialogUpdateFacultad from "../dialog/DialogUpdateFacultad";
 import Carga from "../Carga";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
+import { SchoolSharp } from "@mui/icons-material";
 
 
 const SeccionFacultades = (props) => {
@@ -116,8 +117,8 @@ const SeccionFacultades = (props) => {
       >
         <Grid  width={'100%'} ref={gridBotones} container justifyContent={"flex-start"}>
           
-          <Grid container item xs={6}>
-            <Grid item xs={12} sm={5}>
+          <Grid container item xs={12}>
+            <Grid item xs={12} sm={4} md={2}>
               <Button
                 variant="outlined"
                 startIcon={<SchoolIcon />}
@@ -248,14 +249,17 @@ const SeccionFacultades = (props) => {
                         </TableCell>
                         <TableCell>{row.color }</TableCell>
                         <TableCell>
-                        <img
-                            src={row?.logo || imagenNoDisponible}
-                            alt="cargando"
-                            style={{
-                              width: '5vw',
-                              height: '5vw'
-                            }}
-                          />
+                          {row?.logo ?
+                            <img
+                              src={row?.logo}
+                              alt="cargando"
+                              style={{
+                                width: '5vw',
+                                height: '5vw',
+                                borderRadius: '50%'
+                              }}
+                            />: <SchoolIcon style={{width: '5vw',
+                            height: '5vw',}} />}
                         </TableCell>
                         <TableCell>{row.carreras?.map(carrera => carrera?.nombre)?.join(',')}</TableCell>
                         <TableCell>{decanos?.filter(decano => decano?.id === row?.decano_id)[0]?.nombre}</TableCell>

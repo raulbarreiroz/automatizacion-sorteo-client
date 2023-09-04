@@ -70,6 +70,8 @@ const DialogUsarArchivoProfesor = (props) => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(worksheet);
+        console.log('json')
+        console.log(json)
         setArrayDeArchivoSeleccionado(json);
       };
       reader.readAsArrayBuffer(archivoSeleccionado);
@@ -77,14 +79,17 @@ const DialogUsarArchivoProfesor = (props) => {
   }, [archivoSeleccionado]);
 
   useEffect(() => {
+    console.log('arrayDeArchivoSeleccionado')
+    console.log(arrayDeArchivoSeleccionado)
+
     setArrayDeArchivoSeleccionadoConNovedades(
       arrayDeArchivoSeleccionado?.map((row) => {
-        const rowCedula = row?.cedula ? row?.cedula?.trim() : "";
-        const rowNombre1 = row?.nombre1?.trim() || "";
-        const rowNombre2 = row?.nombre2?.trim() || "";
-        const rowApellido1 = row?.apellido1?.trim() || "";
-        const rowApellido2 = row?.apellido2?.trim() || "";
-        const rowFacultad = row?.facultad?.trim() || "";
+        const rowCedula = row?.cedula ? row?.cedula?.toString()?.trim() : "";
+        const rowNombre1 = row?.nombre1 ? row?.nombre1?.trim() : "";
+        const rowNombre2 = row?.nombre2 ? row?.nombre2?.trim() : "";
+        const rowApellido1 = row?.apellido1 ? row?.apellido1?.trim() : "";
+        const rowApellido2 = row?.apellido2 ? row?.apellido2?.trim() : "";
+        const rowFacultad = row?.facultad ? row?.facultad?.trim() : "";
 
         const novedades = {
           rowConError: false,
@@ -295,6 +300,7 @@ const DialogUsarArchivoProfesor = (props) => {
         apellido1: "",
         apellido2: "",
         facultad: "",
+        imagen: ''
       },
     ]);
     const workbook = XLSX.utils.book_new();
@@ -597,11 +603,11 @@ const DialogUsarArchivoProfesor = (props) => {
                             row?.cedula?.novedad === 0 ? "default" : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.cedula?.novedad !== 0) {
+                          //if (row?.cedula?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("cedula");
-                          }
+                          //}
                         }}
                       >
                         <Tooltip
@@ -635,11 +641,11 @@ const DialogUsarArchivoProfesor = (props) => {
                             row?.nombre1?.novedad === 0 ? "default" : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.nombre1?.novedad !== 0) {
+                         // if (row?.nombre1?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("nombre1");
-                          }
+                          //}
                         }}
                       >
                         <Tooltip
@@ -673,11 +679,11 @@ const DialogUsarArchivoProfesor = (props) => {
                             row?.nombre2?.novedad === 0 ? "default" : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.nombre2?.novedad !== 0) {
+                          //if (row?.nombre2?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("nombre2");
-                          }
+                         // }
                         }}
                       >
                         <Tooltip
@@ -713,11 +719,11 @@ const DialogUsarArchivoProfesor = (props) => {
                               : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.apellido1?.novedad !== 0) {
+                          //if (row?.apellido1?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("apellido1");
-                          }
+                          //}
                         }}
                       >
                         <Tooltip
@@ -753,11 +759,11 @@ const DialogUsarArchivoProfesor = (props) => {
                               : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.apellido2?.novedad !== 0) {
+                          //if (row?.apellido2?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("apellido2");
-                          }
+                          //}
                         }}
                       >
                         <Tooltip
@@ -793,11 +799,11 @@ const DialogUsarArchivoProfesor = (props) => {
                               : "pointer",
                         }}
                         onClick={(e) => {
-                          if (row?.facultad?.novedad !== 0) {
+                          //if (row?.facultad?.novedad !== 0) {
                             setRowSeleccionado(row);
                             setMostrarDialogEditarRegistro(true);
                             setCampoPorEditarDialogEditarRegistro("facultad");
-                          }
+                          //}
                         }}
                       >
                         <Tooltip
@@ -867,13 +873,12 @@ const DialogUsarArchivoProfesor = (props) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                           cedula,
-                          detalleId: facultad,
+                          facultadId: facultad,
                           nombre1,
                           nombre2,
                           apellido1,
                           apellido2,
-                          cabeceraId: props?.cabeceraId,
-                          creadoPor: "admin@test.com",
+                          imagen: ''                          
                         }),
                       }
                     );
@@ -904,9 +909,24 @@ const DialogUsarArchivoProfesor = (props) => {
                 props?.setCargando(true);
                 props?.setMostrarDialogUsarArchivo(false);
                 e.preventDefault();
+
+                
+
                 const archivoFinal = [];
                 for (const row of arrayDeArchivoSeleccionadoConNovedades) {
                   const profesor = await crearProfesor(row, archivoFinal);
+                  
+                  const statusCode = Number.parseInt(profesor?.statusCode)
+                  if (statusCode >= 200 && statusCode <= 299) {
+                    profesor['significadoStatusCode'] = 'Ingreso exitoso'
+                  } else if (statusCode >= 400 && statusCode <= 499) {
+                    profesor['significadoStatusCode'] = 'Error por parte del cliente'
+                  } else if (statusCode >= 500 && statusCode <= 599) {
+                    profesor['significadoStatusCode'] = 'Error por parte del servidor' 
+                  } else {
+                    profesor['significadoStatusCode'] = 'Mensaje informativo acerca de respuesta HTTP'
+                  }
+
                   archivoFinal?.push(profesor);
                 }
                 generarArchivoFinal(archivoFinal);
@@ -916,7 +936,9 @@ const DialogUsarArchivoProfesor = (props) => {
                 props?.getProfesores();
               }}
             >
-              GENERAR PROFESORES
+              {arrayDeArchivoSeleccionadoConNovedades?.filter(
+                  (row) => row?.rowConError
+                )?.length > 0 ? 'EXISTEN REGISTROS CON ERRORES' : 'GENERAR PROFESORES'}
             </Button>
           </Grid>
         </DialogContent>

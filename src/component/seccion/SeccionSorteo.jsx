@@ -37,6 +37,7 @@ const SeccionSorteo = (props) => {
   const [hoveredCell, setHoveredCell] = useState(undefined);
   const [profesores, setProfesores] = useState(undefined)
   const [nombreRegalos, setNombreRegalos] = useState(undefined)
+  const [regaloSeleccionado, setRegaloSeleccionado] = useState(undefined)
   const getFacultades = useCallback(async () => {
     try {
       const response = await fetch(
@@ -266,13 +267,10 @@ const SeccionSorteo = (props) => {
                   id="facultad"
                   name="facultad"
                   fullWidth
-                  defaultValue={
-                    props?.profesorSeleccionado?.facultad_id ||
-                    (props?.facultades?.length
-                      ? props?.facultades[0]?.id
-                      : "")
-                  }
-                  
+                    value={regaloSeleccionado}
+                    onChange={e => {
+                      setRegaloSeleccionado(e?.target?.value)
+                    }}
                 >
                   {nombreRegalos?.length &&
                     nombreRegalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado )?.map((regalo) => {
@@ -297,48 +295,129 @@ const SeccionSorteo = (props) => {
                         return Math.floor(Math.random() * max);
                       }
                       
-                      facultades?.forEach(facultad => {
+                  if (tipoDeDonacionSeleccinado === 1) {
+                    facultades?.forEach(facultad => {
                         
-                        const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado && 
-                          regalo?.facultad_id === facultad?.id)
-                        const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
-                        console.log(facultad?.profesores)
-                        if (r?.length > 0 && p?.length > 0) {
-                          console.log('regalos: ')
-                          console.log(r)
-                          console.log('profesores')
-                          console.log(p)
+                      const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado &&
+                        regalo?.facultad_id === facultad?.id)
+                      const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
+                      console.log(facultad?.profesores)
+                      if (r?.length > 0 && p?.length > 0) {
+                        console.log('regalos: ')
+                        console.log(r)
+                        console.log('profesores')
+                        console.log(p)
 
-                          const indiceRegaloSeleccionado = getRandomInt(r?.length)
-                          const indiceProfesorSeleccionado = getRandomInt(p?.length)
+                        const indiceRegaloSeleccionado = getRandomInt(r?.length)
+                        const indiceProfesorSeleccionado = getRandomInt(p?.length)
                         
-                          console.log(indiceRegaloSeleccionado)
-                          console.log(indiceProfesorSeleccionado)
+                        console.log(indiceRegaloSeleccionado)
+                        console.log(indiceProfesorSeleccionado)
 
-                          const regaloSeleccionado = r[indiceRegaloSeleccionado]
-                          const profesorSeleccionado = p[indiceProfesorSeleccionado]
+                        const regaloSeleccionado = r[indiceRegaloSeleccionado]
+                        const profesorSeleccionado = p[indiceProfesorSeleccionado]
 
-                          console.log(regaloSeleccionado)
-                          console.log(profesorSeleccionado)
+                        console.log(regaloSeleccionado)
+                        console.log(profesorSeleccionado)
 
-                          console.log('sorteo')
-                          console.log(sorteo)
+                        console.log('sorteo')
+                        console.log(sorteo)
 
+                        setSorteo(prev => [...prev, {
+                          profesor: profesorSeleccionado,
+                          regalo: regaloSeleccionado,
+                        }])
+
+                        console.log(facultades?.map(prev => {
+                          if (prev?.id === facultad?.id) {
+                            prev['isFlipped'] = true
+                            prev['profesorSeleccionado'] = profesorSeleccionado
+                            prev['regaloSeleccionado'] = regaloSeleccionado
+                          }
+                          return prev
+                        }))
+                      }
+                    })
+                  } else if (tipoDeDonacionSeleccinado === 2) {
+                    facultades?.forEach(facultad => {
+                      console.log('iteracion por facultad')
+                      const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado &&
+                        regalo?.facultad_id === facultad?.id && regalo?.nombre === regaloSeleccionado)                      
+                      const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
+                      console.log(facultad?.profesores)
+                      if (r?.length > 0 && p?.length > 0) {
+                        console.log('regalos: ')
+                        console.log(r)
+                        console.log('profesores')
+                        console.log(p)
+                             
+                        function shuffleArray(inputArray){
+                          return inputArray.sort((a, b)=> (Math.random() - a?.id) - (Math.random() - b?.id));
+                        } 
+
+                        const rMezclado = shuffleArray(r)
+                        const pMezclado = shuffleArray(p)
+
+                        while (rMezclado?.length > 0 && pMezclado?.length > 0) 
+                        {
+                          const profesorSeleccionado = pMezclado?.pop()
+                          const regaloSeleccionado = rMezclado?.pop()
+                          console.log('iteracion por regalo')
                           setSorteo(prev => [...prev, {
                             profesor: profesorSeleccionado,
                             regalo: regaloSeleccionado,
                           }])
+                        }                                                                                                                      
+                      }
+                    })
+                  } else if (tipoDeDonacionSeleccinado === 3) {                    
+                      console.log('iteracion por facultad')
+                      const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado &&
+                        regalo?.nombre === regaloSeleccionado) 
+                    const rNuevo = r?.map(regalo => {
+                      if (regalo?.facultad_id === -1) {
+                        const indiceFacultadSeleccionado = getRandomInt(r?.length)
+                        console.log('facultadSeleccionada')
+                        regalo.facultad_id = facultades[indiceFacultadSeleccionado]?.id
+                      }
+                      return regalo
+                    })
+                    console.log(rNuevo)
+                    console.log('regalos tipodonacion3, pueden o no tener facultad_id')
+                    console.log(r)
+                    
+                    facultades?.forEach(facultad => {
+                      console.log('iteracion por facultad')
+                      const r = rNuevo?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado &&
+                        regalo?.facultad_id === facultad?.id && regalo?.nombre === regaloSeleccionado)                      
+                      const p = facultad?.profesores?.filter(profesor => profesor?.asistio?.trim() === 'SI' && !profesor?.regalo_id)
+                      console.log(facultad?.profesores)
+                      if (r?.length > 0 && p?.length > 0) {
+                        console.log('regalos: ')
+                        console.log(r)
+                        console.log('profesores')
+                        console.log(p)
+                             
+                        function shuffleArray(inputArray){
+                          return inputArray.sort((a, b)=> (Math.random() - a?.id) - (Math.random() - b?.id));
+                        } 
 
-                          console.log(facultades?.map(prev => {
-                            if (prev?.id === facultad?.id) {
-                              prev['isFlipped'] = true
-                              prev['profesorSeleccionado'] = profesorSeleccionado
-                              prev['regaloSeleccionado'] = regaloSeleccionado
-                            }
-                            return prev
-                          }))
-                        }
-                      })
+                        const rMezclado = shuffleArray(r)
+                        const pMezclado = shuffleArray(p)
+
+                        while (rMezclado?.length > 0 && pMezclado?.length > 0) 
+                        {
+                          const profesorSeleccionado = pMezclado?.pop()
+                          const regaloSeleccionado = rMezclado?.pop()
+                          console.log('iteracion por regalo')
+                          setSorteo(prev => [...prev, {
+                            profesor: profesorSeleccionado,
+                            regalo: regaloSeleccionado,
+                          }])
+                        }                                                                                                                      
+                      }
+                    })
+                  }
                 
                       setTimeout(function () {
                         console.log("vean los ganadores");
@@ -346,7 +425,11 @@ const SeccionSorteo = (props) => {
                       }, 500);                  
                
                     }}
-                  >
+                  
+                disabled={
+                  tipoDeDonacionSeleccinado !== 1 ? regaloSeleccionado ? false : true : false
+                }
+                >
                     EMPEZAR RONDA
               </Button>
               <Button
@@ -566,17 +649,18 @@ const SeccionSorteo = (props) => {
             onClick={e => { 
               const asignarRegalo = async (s) => {                
                 try {
-                  await fetch(
-                    `${process.env.REACT_APP_SERVERURL}/asignarRegalo/${s?.profesor?.cedula}`,
+                  const asignarRegalo = await fetch(
+                    `${process.env.REACT_APP_SERVERURL}/asignarRegalo`,
                     {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
-                        cedula: s?.profesor?.cedula,
-                        asignarRegalo: s?.regalo?.id
+                        profesorId: s?.profesor?.id?.toString(),   
+                        regaloId: s?.regalo?.id?.toString()
                       }),
                     }
-                  );                  
+                  );
+                  return asignarRegalo
                 } catch (err) {
                   console.log(err);
                 }
@@ -584,31 +668,61 @@ const SeccionSorteo = (props) => {
 
               const asignarProfesor = async (s) => {                
                 try {
-                  await fetch(
-                    `${process.env.REACT_APP_SERVERURL}/asignarProfesor/${s?.regalo?.id}`,
+                  const asignarProfesor = await fetch(
+                    `${process.env.REACT_APP_SERVERURL}/asignarProfesor`,
                     {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({                        
-                        profesorId: s?.profesor?.cedula
+                        profesorId: s?.profesor?.id?.toString(),
+                        regaloId: s?.regalo?.id?.toString()
                       }),
                     }
-                  );                  
+                  );
+                  return asignarProfesor
                 } catch (err) {
                   console.log(err);
                 }
               };
-            
-                setCargando(true)
-                for (const s of sorteo) {
-                  console.log(s)
+
+              const agregarRegistroBitacora = async (s) => {                
+                try {
+                  const agregarRegistroBitacora = await fetch(
+                    `${process.env.REACT_APP_SERVERURL}/agregar-registro-bitacora`,
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({                        
+                        nombreProfesor: `${s?.profesor?.nombre1} ${s?.profesor?.nombre2} ${s?.profesor?.apellido1} ${s?.profesor?.apellido2}`,
+                        nombreRegalo: s?.regalo?.nombre,
+                        nombreFacultad: facultades?.filter(f => f?.id === s?.regalo?.facultad_id)[0]?.nombre
+                      }),
+                    }
+                  );
+                  return agregarRegistroBitacora
+                } catch (err) {
+                  console.log(err);
+                }
+              };
+
+              const funciones = async (s) => {
+                console.log(s)
                   console.log('regalo_id')
                   console.log(s?.regalo?.id)
                   console.log('profesor_id')
                   console.log(s?.profesor?.id)
 
-                  asignarProfesor(s)
-                  asignarRegalo(s)
+                  const p = await asignarProfesor(s)
+                  const r = await asignarRegalo(s)
+                  console.log(p)
+                  console.log(r)
+                  const b = await agregarRegistroBitacora(s)
+                  console.log(b)
+              }
+            
+                setCargando(true)
+                for (const s of sorteo) {
+                  funciones(s)
                 }
                 
                 

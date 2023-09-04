@@ -12,7 +12,6 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { mainListItems, secondaryListItems } from "../ListItems";
@@ -24,7 +23,12 @@ import SeccionUsuarios from "../seccion/SeccionUsuarios";
 import SeccionFacultades from "../seccion/SeccionFacultades";
 import SeccionCarreras from "../seccion/SeccionCarreras";
 import SeccionTipoDonacion from "../seccion/SeccionTipoDonacion";
-
+import SeccionInicio from '../seccion/SeccionInicio'
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+import Link from "@mui/material/Link";
+import Carga from "../Carga";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 function Copyright(props) {
   return (
@@ -112,7 +116,10 @@ export default function Dashboard(props) {
   const [open, setOpen] = React.useState(true);
   const [seccion, setSeccion] = useState(undefined);
   const [windowWidth, setWindowWidth] = useState(undefined);
-  const [windowHeight, setWindowHeight] = useState(undefined);
+  const [, setWindowHeight] = useState(undefined);
+  const navigate = useNavigate()
+  const [cargando, setCargando] = useState(undefined)
+  const [cookies, setCookie, removeCookie] = useCookies(null);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -135,14 +142,16 @@ export default function Dashboard(props) {
   }, []);
 
   useEffect(() => {
-    setSeccion(props?.seccion);    
-  }, [location, props?.seccion]);
+    console.log('location')
+    console.log(location)
+   
+    setSeccion(props?.seccion);
+  }, [location]);
 
   useEffect(() => {
-    console.log('seccion: ')
-    console.log(seccion)
-    
-  }, [seccion])
+    console.log('appLocation in dashboard')
+    console.log(props?.appLocation)
+  }, [props])
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -151,7 +160,7 @@ export default function Dashboard(props) {
         <AppBar position="absolute" open={open} ref={appBarRef}>
           <Toolbar
             sx={{
-              pr: "24px", // keep right padding when drawer closed
+              pr: "24px", // keep right padding when drawer closed,                          
             }}
           >
             <IconButton
@@ -176,6 +185,20 @@ export default function Dashboard(props) {
               Plataforma de Automatización de Sorteo de Regalos /{" "}
               {seccion?.substring(7)}
             </Typography>
+            <IconButton
+              color="inherit"
+              onClick={e => {
+                navigate('/')
+                removeCookie('EMAIL')
+                removeCookie('TOKEN')
+                removeCookie('ALIAS')
+                removeCookie('ROL_ID')
+              }
+              }
+            >
+              <LogoutIcon
+              />
+            </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -194,9 +217,19 @@ export default function Dashboard(props) {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            {(cookies?.EMAIL &&
+              cookies?.TOKEN &&
+              cookies?.ALIAS &&
+              cookies?.ROL_ID) && (cookies?.ROL_ID === 1 || cookies?.ROL_ID === 2) && mainListItems}
+            {(cookies?.EMAIL &&
+              cookies?.TOKEN &&
+              cookies?.ALIAS &&
+              cookies?.ROL_ID) & cookies?.ROL_ID === 1 &&
+              <>
+                <Divider sx={{ my: 1 }} />
+                {secondaryListItems}
+              </>
+            }
           </List>
         </Drawer>
         <Box
@@ -214,9 +247,8 @@ export default function Dashboard(props) {
           <Toolbar />
           <Grid
             style={{
-              height: `${
-                boxRef?.current?.clientHeight - appBarRef?.current?.clientHeight
-              }px`,
+              height: `${boxRef?.current?.clientHeight - appBarRef?.current?.clientHeight
+                }px`,
               width: `${windowWidth - toolbarRef?.current?.clientWidth}px)`,
               display: "flex",
               flexDirection: "column",
@@ -232,7 +264,8 @@ export default function Dashboard(props) {
                 height: "96%",
               }}
               ref={seccionContainerRef}
-            >              
+            >
+              {seccion === 'SeccionInicio' && <SeccionInicio />}
               {seccion === "SeccionSorteo" && (
                 <SeccionSorteo setOpen={setOpen} />
               )}
@@ -255,7 +288,8 @@ export default function Dashboard(props) {
             </Grid>
           </Grid>
         </Box>
+        <Carga cargando={cargando} />
       </Box>
     </ThemeProvider>
-  );
+            );
 }
