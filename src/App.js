@@ -48,10 +48,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL &&
-              cookies?.TOKEN &&
-              cookies?.ALIAS &&
-              cookies?.ROL_ID ? (
+              cookies?.EMAIL && cookies?.TOKEN ? (
                 <Dashboard
                   seccion="SeccionInicio"
                   setSeverity={setSeverity}
