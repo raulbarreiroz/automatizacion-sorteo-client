@@ -148,7 +148,7 @@ const DialogUpdateUsuario = (props) => {
       >
         <div>
           {props?.modoDialogUpdateUsuario === "ADD" ? (
-            <Typography>{`AÑADIR NUEVO REGALO`}</Typography>
+            <Typography>{`AÑADIR NUEVO USUARIO`}</Typography>
           ) : props?.modoDialogUpdateUsuario === "EDIT" ? (
             <Typography>EDITAR USUARIO</Typography>
           ) : (
