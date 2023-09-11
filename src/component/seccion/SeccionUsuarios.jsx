@@ -14,6 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DialogUpdateUsuario from "../dialog/DialogUpdateUsuario";
 import Carga from "../Carga";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const SeccionUsuarios = (props) => {
   const [cargando, setCargando] = useState(false);
@@ -27,24 +28,9 @@ const SeccionUsuarios = (props) => {
   const [usuarios, setUsuarios] = useState(undefined);
   const [cabeceraId] = useState(11); // cabecera de catalogo de rol
   const [roles, setRoles] = useState(undefined);
-  const getRoles = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/catalogo/${cabeceraId}`
-      );
-      const cabecera = await response.json();
-      if (cabecera?.length) {
-        const roles = cabecera[0]?.detalles;
-        setRoles(roles?.length ? roles : []);
-      } else {
-        setRoles([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setRoles([]);
-    }
-    setCargando(false);
-  }, [cabeceraId]);
+  const [,setSeverity] = useState(undefined)
+  const [, setMessage] = useState(undefined)
+  const [,setOpenSnackBar] = useState(undefined)
   const getUsuarios = useCallback(async () => {
     try {
       const response = await fetch(
@@ -67,10 +53,17 @@ const SeccionUsuarios = (props) => {
   }, []);
 
   useEffect(() => {
-    setCargando(true);
-    getRoles();
+    if (props) {
+      setSeverity(props?.setSeverity || undefined)
+      setMessage(props?.setMessage || undefined)
+      setOpenSnackBar(props?.setOpenSnackBar || undefined)                  
+    }
+  }, [props])
+
+  useEffect(() => {
+    setCargando(true);    
     getUsuarios();
-  }, [getUsuarios, getRoles]);
+  }, [getUsuarios]);
 
   return (
     <>
@@ -138,23 +131,7 @@ const SeccionUsuarios = (props) => {
                       }}
                     >
                       ROL
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Creado por
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Fecha de Creacion
-                    </TableCell>
+                    </TableCell>                   
                     <TableCell
                       style={{
                         backgroundColor: "rgb(153, 0, 0)",
@@ -167,12 +144,21 @@ const SeccionUsuarios = (props) => {
                     <TableCell
                       style={{
                         backgroundColor: "rgb(153, 0, 0)",
+                        color: "white",                       
+                      }}
+                      width="20px"
+                    >
+                      Borrar
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        backgroundColor: "rgb(153, 0, 0)",
                         color: "white",
                         borderStartEndRadius: "5px",
                       }}
                       width="20px"
                     >
-                      Borrar
+                      RESETEAR CONTRASEÑA
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -204,12 +190,9 @@ const SeccionUsuarios = (props) => {
                       <TableCell>{row?.alias}</TableCell>
                       <TableCell>
                         {
-                          roles?.filter((rol) => rol?.id === row?.detalle_id)[0]
-                            ?.nombre
+                          row?.rol_id === 3 ? 'ADMINISTRADOR' : 'GESTOR DE SORTEO'
                         }
-                      </TableCell>
-                      <TableCell>{row.creado_por}</TableCell>
-                      <TableCell>{row.fecha_creacion}</TableCell>
+                      </TableCell>                     
                       <TableCell>
                         <EditIcon
                           style={{
@@ -223,7 +206,7 @@ const SeccionUsuarios = (props) => {
                         />
                       </TableCell>
                       <TableCell>
-                        <DeleteForeverIcon
+                        {row?.rol_id !== 3 ? <DeleteForeverIcon
                           style={{
                             cursor: "pointer",
                           }}
@@ -232,7 +215,42 @@ const SeccionUsuarios = (props) => {
                             setModoDialogUpdateUsuario("DELETE");
                             setUsuarioSeleccionado(row);
                           }}
-                        />
+                        /> : ''}
+                      </TableCell>
+                      <TableCell>
+                        {row?.rol_id === 3 ? '' : !row?.hashed_pwd ? 'Usuario debe cambiar CONTRASEÑA' : <RefreshIcon
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={async (e) => {                            
+                            const actualizarUsuario = async () => {      
+                              try {
+                                const response = await fetch(
+                                  `${process.env.REACT_APP_SERVERURL}/usuario/${row?.id}`,
+                                  {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      email: row?.email,            
+                                      alias: row?.alias,
+                                      borrarPwd: true
+                                    })            
+                                  }
+                                );
+                                if (response.status === 200) {                                  
+                                  getUsuarios();
+                                  setCargando(false)
+                                }
+                              } catch (err) {
+                                console.log(err);
+                              }
+                            };
+                            
+                            setCargando(true)
+                            actualizarUsuario()
+
+                          }}
+                        />}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -261,6 +279,9 @@ const SeccionUsuarios = (props) => {
         getUsuarios={getUsuarios}
         roles={roles}
         cabeceraId={cabeceraId}
+        setSeverity={setSeverity}
+        setMessage={setMessage}
+        setOpenSnackBar={setOpenSnackBar}
       />
       <Carga cargando={cargando} />
     </>

@@ -169,7 +169,7 @@ const SeccionTipoDonacion = (props) => {
                         </TableCell>
                         <TableCell>{row.descripcion}</TableCell>                                                      
                         <TableCell>
-                          <EditIcon
+                          {row?.id >= 4 ? <EditIcon
                             style={{
                               cursor: "pointer",
                             }}
@@ -178,10 +178,10 @@ const SeccionTipoDonacion = (props) => {
                               setModoDialogUpdateTipoDeDonacion("EDIT");
                               setTipoDeDonacionSeleccionada(row);
                             }}
-                          />
+                          /> : ''}
                         </TableCell>
                         <TableCell>
-                          <DeleteForeverIcon
+                          {row?.id >= 4 ? <DeleteForeverIcon
                             style={{
                               cursor: "pointer",
                             }}
@@ -190,7 +190,7 @@ const SeccionTipoDonacion = (props) => {
                               setModoDialogUpdateTipoDeDonacion("DELETE");
                               setTipoDeDonacionSeleccionada(row);
                             }}
-                          />
+                          /> : ''}
                         </TableCell>
                       </TableRow>
                     );

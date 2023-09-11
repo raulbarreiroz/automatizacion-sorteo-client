@@ -13,13 +13,12 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 
 const DialogUpdateUsuario = (props) => {
   const [, setCookie] = useCookies(null);
   const navigate = useNavigate();
-
-
 
   const handleSubmit = (event) => {
     const crearUsuario = async () => {
@@ -40,23 +39,16 @@ const DialogUpdateUsuario = (props) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              email,
+              email: props?.usuarioSeleccionado?.rol_id === 3 ? props?.usuarioSeleccionado?.email : email,
               pwd,
               alias,                                        
             }),
           }
         );
         if (response.status === 200) {
-          console.log('hola')
-          const usuario = await response?.json()
+          const usuario = await response?.json()        
           
-          console.log('usuario')
-          console.log(usuario)
-          
-          if (usuario) {
-            console.log(usuario?.severity)
-            console.log(usuario?.message)
-
+          if (usuario) {            
             if (usuario?.email && usuario?.token) {
               setCookie('EMAIL', usuario?.email)
               setCookie('TOKEN', usuario?.token)
@@ -79,10 +71,16 @@ const DialogUpdateUsuario = (props) => {
 
     const actualizarUsuario = async () => {
       const data = new FormData(event.currentTarget);
-      const email = data.get("email");
-      const pwd = data?.get("pwd");
+      let email = data.get("email");          
       const alias = data?.get("alias");
-      const rol = data?.get("rol");
+      let hashed_pwd
+
+      if (!email) {
+        email = props?.usuarioSeleccionado?.email || ''        
+      }
+
+      console.log('email', email)      
+      console.log('alias', alias)      
       try {
         const response = await fetch(
           `${process.env.REACT_APP_SERVERURL}/usuario/${props?.usuarioSeleccionado?.id}`,
@@ -90,16 +88,9 @@ const DialogUpdateUsuario = (props) => {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              email,
-              pwd: props?.modoDialogUpdateUsuario === "EDIT" ? undefined : pwd,
-              hashedPwd:
-                props?.modoDialogUpdateUsuario !== "EDIT"
-                  ? props?.usuarioSeleccionado?.hashed_pwd
-                  : undefined,
-              alias,
-              cabeceraId: props?.cabeceraId,
-              detalleId: rol,
-            }),
+              email,            
+              alias,                            
+            })            
           }
         );
         if (response.status === 200) {
@@ -189,7 +180,7 @@ const DialogUpdateUsuario = (props) => {
           sx={{ mt: 0.5 }}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <InputLabel required>EMAIL</InputLabel>
               <TextField
                 size="small"
@@ -199,10 +190,11 @@ const DialogUpdateUsuario = (props) => {
                 id="email"
                 defaultValue={props?.usuarioSeleccionado?.email || ""}
                 disabled={
-                  props?.modoDialogUpdateUsuario === "DELETE" ? true : false
+                  props?.modoDialogUpdateUsuario === "DELETE" || props?.usuarioSeleccionado?.rol_id === 3 ? true : false
                 }
               />
             </Grid>
+            {/*
             <Grid item xs={12} sm={6}>
               <InputLabel>CONTRASEÑA</InputLabel>
               <TextField
@@ -224,6 +216,7 @@ const DialogUpdateUsuario = (props) => {
                 }
               />
             </Grid>
+              */}
             <Grid item xs={12} sm={12}>
               <InputLabel>ALIAS</InputLabel>
               <TextField

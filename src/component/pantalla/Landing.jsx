@@ -8,7 +8,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import DialogCrearUsuario from "../dialog/DialogCrearUsuario";
 import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +44,47 @@ export default function Landing(props) {
     useState(false);    
   const [cargando, setCargando] = useState(undefined)
   const [, setCookie] = useCookies(null);
+  const [email, setEmail] = useState('')
+  const [pwd, setPwd] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
+
+  const [usuarioDebeCambiarPwd, setUsuarioDebeCambiarPwd] = useState(undefined)
+  const [usuarios, setUsuarios] = useState(undefined)
+
+  const getUsuarios = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/usuarios`
+      );
+      const usuarios = await response.json();
+
+      if (usuarios?.length) {
+        console.log("usuarios: ");
+        console.log(usuarios);
+        setUsuarios(usuarios);
+      } else {
+        setUsuarios([]);
+      }
+    } catch (err) {
+      console.log(err);
+      setUsuarios([]);
+    }
+    setCargando(false);
+  }, []);
+
+  useEffect(() => {
+    console.log('eusuarios que deben cambiar')
+    const usuariosConPwdNull = usuarios?.filter(u => !u?.hashed_pwd && email?.toLowerCase() === u?.email?.toLowerCase())
+    if (usuariosConPwdNull?.length > 0) {
+      setUsuarioDebeCambiarPwd(usuariosConPwdNull[0])
+    } else {
+      setUsuarioDebeCambiarPwd(undefined)
+    }
+  }, [usuarios, email])
+
+  useEffect(() => {
+    getUsuarios()
+  }, [getUsuarios])
 
   const handleSubmit = (event) => {
     event.preventDefault();   
@@ -52,6 +93,30 @@ export default function Landing(props) {
       const data = new FormData(event.currentTarget);
       const email = data.get("email");
       const pwd = data.get("pwd");            
+
+      const actualizarUsuario = async () => {      
+        try {
+          await fetch(
+            `${process.env.REACT_APP_SERVERURL}/usuario/${usuarioDebeCambiarPwd?.id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: usuarioDebeCambiarPwd?.email,            
+                alias: usuarioDebeCambiarPwd?.alias,
+                actualizarPwd: pwd
+              })            
+            }
+          );
+          
+        } catch (err) {
+          console.log(err);
+        }
+      };
+
+      if (usuarioDebeCambiarPwd) {
+        actualizarUsuario()
+      }
 
       try {
         const response = await fetch(
@@ -100,6 +165,11 @@ export default function Landing(props) {
     iniciarSesion()    
   };  
 
+  useEffect(() => {
+    console.log('email')
+    console.log(email)
+  }, [email])
+
   return (
     <>
       <ThemeProvider theme={defaultTheme}>
@@ -127,31 +197,53 @@ export default function Landing(props) {
             >
               <Grid container spacing={2}>
                 <Grid item xs={12}>
+                  EMAIL
                   <TextField
                     required
                     fullWidth
-                    id="email"
-                    label="email"
+                    id="email"                    
                     name="email"
-                    autoComplete="email"
+                    value={email}
+                    onChange={e => {
+                      setEmail(e?.target?.value)
+                    }}
                     style={{
                       backgroundColor: "white",
                     }}
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  {'contraseña'?.toUpperCase()}
                   <TextField
                     required
                     fullWidth
                     name="pwd"
-                    label="contraseña"
-                    type="password"
-                    id="pwd"
+                    value={pwd}
+                    onChange={e => {
+                      setPwd(e?.target?.value)
+                    }}
+                    type="password"                    id="pwd"
                     style={{
                       backgroundColor: "white",
                     }}
                   />
                 </Grid>
+                {usuarioDebeCambiarPwd ? <Grid item xs={12}>
+                  {'confirmar contraseña'?.toUpperCase()}
+                  <TextField
+                    required
+                    fullWidth
+                    name="confirmPwd"
+                    value={confirmPwd}
+                    onChange={e => {
+                      setConfirmPwd(e?.target?.value)
+                    }}
+                    type="password" id="pwd"
+                    style={{
+                      backgroundColor: "white",
+                    }}
+                  />
+                </Grid> : ''}
                 <Grid item xs={12} sm={12} margin={0} padding={0} width="100%">
                   <Button
                     type="submit"
@@ -160,8 +252,9 @@ export default function Landing(props) {
                       backgroundColor: "#990000",
                       color: "white",
                     }}
+                    disabled={usuarioDebeCambiarPwd ? pwd !== confirmPwd ? true : false : false}
                   >
-                    Iniciar Sesión
+                    {usuarioDebeCambiarPwd ? 'Debe cambiar la contraseña' : 'Iniciar Sesión'}
                   </Button>
                 </Grid>
                 {/*

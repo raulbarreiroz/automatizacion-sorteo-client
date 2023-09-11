@@ -220,11 +220,11 @@ export default function Dashboard(props) {
             {(cookies?.EMAIL &&
               cookies?.TOKEN &&
               cookies?.ALIAS &&
-              cookies?.ROL_ID) && (cookies?.ROL_ID === 1 || cookies?.ROL_ID === 2) && mainListItems}
+              cookies?.ROL_ID) && (cookies?.ROL_ID === 3 || cookies?.ROL_ID === 4) && mainListItems}
             {(cookies?.EMAIL &&
               cookies?.TOKEN &&
               cookies?.ALIAS &&
-              cookies?.ROL_ID) & cookies?.ROL_ID === 1 ?
+              cookies?.ROL_ID) & cookies?.ROL_ID === 3 ?
               <>
                 <Divider sx={{ my: 1 }} />
                 {secondaryListItems}

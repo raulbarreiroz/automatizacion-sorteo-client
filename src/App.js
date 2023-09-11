@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Landing from "./component/pantalla/Landing";
 import Dashboard from "./component/pantalla/Dashboard";
 import PaginaNoEncontrada from "./component/pantalla/PaginaNoEncontrada";
@@ -17,6 +17,7 @@ const App = () => {
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
+  const [sesionIniciada, setSesionIniciada] = useState(false);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -25,6 +26,42 @@ const App = () => {
 
     setOpenSnackBar(false);
   };
+
+  const getSesionIniciada = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/sesion-iniciada`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cookies,
+          }),
+        }
+      );
+      const sesionIniciada = await response.json();
+
+      console.log("sesioniniciada");
+      console.log(sesionIniciada);
+
+      if (sesionIniciada) {
+        if (sesionIniciada?.sesionIniciada) {
+          setSesionIniciada(true);
+        } else {
+          setSesionIniciada(false);
+        }
+      } else {
+        setSesionIniciada(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [cookies]);
+
+  useEffect(() => {
+    console.log("sesion iniiciada");
+    getSesionIniciada();
+  }, [cookies, getSesionIniciada]);
 
   return (
     <>
@@ -42,9 +79,15 @@ const App = () => {
                   setMessage={setMessage}
                   setOpenSnackBar={setOpenSnackBar}
                 />
-              ) : (
+              ) : sesionIniciada ? (
                 <Dashboard
                   seccion="SeccionInicio"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
                   setSeverity={setSeverity}
                   setMessage={setMessage}
                   setOpenSnackBar={setOpenSnackBar}
@@ -55,7 +98,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionInicio"
                   setSeverity={setSeverity}
@@ -75,7 +118,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionSorteo"
                   setSeverity={setSeverity}
@@ -95,7 +138,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionProfesores"
                   setSeverity={setSeverity}
@@ -115,7 +158,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionRegalos"
                   setSeverity={setSeverity}
@@ -135,7 +178,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionUsuarios"
                   setSeverity={setSeverity}
@@ -155,7 +198,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionSorteos"
                   setSeverity={setSeverity}
@@ -175,7 +218,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionCatalogo"
                   setSeverity={setSeverity}
@@ -195,7 +238,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionFacultades"
                   setSeverity={setSeverity}
@@ -215,7 +258,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionCarreras"
                   setSeverity={setSeverity}
@@ -235,7 +278,7 @@ const App = () => {
           <Route
             index
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionTipoDonacion"
                   setSeverity={setSeverity}
@@ -255,7 +298,7 @@ const App = () => {
           <Route
             path="dashboard/*"
             element={
-              cookies?.EMAIL && cookies?.TOKEN ? (
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
                   seccion="SeccionInicio"
                   setSeverity={setSeverity}

@@ -224,7 +224,7 @@ const SeccionSorteo = (props) => {
             Seleccione que regalos desea sortear
           </Typography>
         </Grid>
-        {tiposDeDonaciones?.length &&
+        {tiposDeDonaciones?.length ?
           tiposDeDonaciones?.map((tipoDeDonacion) => {
             return (
               <Button
@@ -245,7 +245,7 @@ const SeccionSorteo = (props) => {
                 {tipoDeDonacion?.nombre}
               </Button>
             );
-          })}
+          }) : ''}
         </Paper>}
         {
         tipoDeDonacionSeleccinado && (
