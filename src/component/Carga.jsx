@@ -1,3 +1,5 @@
+import CircularProgress from '@mui/material/CircularProgress';
+
 const Carga = (props) => {
   return (
     <div
@@ -14,13 +16,7 @@ const Carga = (props) => {
         alignItems: "center",
       }}
     >
-      <img
-        src={require("../resources/imagen/patito.gif")}
-        alt="cargando"
-        style={{
-          transform: "scale(1.05)",
-        }}
-      />
+      <CircularProgress />
     </div>
   );
 };
