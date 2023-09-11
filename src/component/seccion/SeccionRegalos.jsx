@@ -15,9 +15,6 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DialogUpdateRegalo from "../dialog/DialogUpdateRegalo";
 import Carga from "../Carga";
 import DialogUsarArchivoRegalo from "../dialog/DialogUsarArchivoRegalo";
-import SaveAsIcon from "@mui/icons-material/SaveAs";
-import PublishIcon from "@mui/icons-material/Publish";
-import Resizer from "react-image-file-resizer";
 import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
 
 const SeccionRegalos = (props) => {
@@ -148,12 +145,7 @@ const SeccionRegalos = (props) => {
     getDecanos()
     getDirectores()
     getRegalos();
-  }, [getRegalos, getTiposDeDonaciones, getFacultades, getCarreras, getDecanos, getDirectores]);
-
-  useEffect(() => {
-    console.log("regalos");
-    console.log(regalos);
-  }, [regalos]);
+  }, [getRegalos, getTiposDeDonaciones, getFacultades, getCarreras, getDecanos, getDirectores]);  
 
   useEffect(() => {
     if (regaloSeleccionado) {
@@ -286,9 +278,7 @@ const SeccionRegalos = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {regalos.map((row, i) => {
-                    console.log("row");
-                    console.log(row);
+                  {regalos.map((row, i) => {                    
                     return (
                       <TableRow
                         key={`${row?.id}-${i}`}

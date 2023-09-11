@@ -370,7 +370,7 @@ const SeccionSorteo = (props) => {
                         }                                                                                                                      
                       }
                     })
-                  } else if (tipoDeDonacionSeleccinado === 3) {                    
+                  } else if (tipoDeDonacionSeleccinado >= 3) {                    
                       console.log('iteracion por facultad')
                       const r = regalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado &&
                         regalo?.nombre === regaloSeleccionado) 
@@ -737,158 +737,160 @@ const SeccionSorteo = (props) => {
       </Dialog>
       <Dialog open={openasistencia} fullWidth>
         <DialogTitle>ASISTENCIA</DialogTitle>
-        <List sx={{ pt: 0 }}>
-          {profesores?.length > 0 ?
+        <List sx={{ pt: 0 }}>          
+          {
+            profesores?.length > 0 ?
             <TableContainer
-              component={Paper}
-              style={{
-                overflowX: "initial",
-              }}
-            >
-              <Table aria-label="tabla de profesores" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                        borderStartStartRadius: "5px",
+            component={Paper}
+            style={{
+              overflowX: "initial",
+            }}
+          >
+            <Table aria-label="tabla de profesores" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    style={{
+                      backgroundColor: "rgb(153, 0, 0)",
+                      color: "white",
+                      borderStartStartRadius: "5px",
+                    }}
+                  >
+                    PROFESOR
+                  </TableCell>
+                  <TableCell
+                    style={{
+                      backgroundColor: "rgb(153, 0, 0)",
+                      color: "white",
+                    }}
+                  >
+                    ASISTIO
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {profesores?.length > 0 && profesores?.map((row, i) => {
+            
+                  return (
+                    <TableRow
+                      key={`${row?.cedula}-${i}`}
+                      sx={{
+                        "&:last-child td, &:last-child th": {
+                          border: 0,
+                        },
+                        backgroundColor:
+                          hoveredCell !== undefined
+                            ? hoveredCell === i
+                              ? "rgba(153, 0, 0, 0.2)"
+                              : "white"
+                            : "white",
+                      }}
+                      onMouseEnter={(e) => {
+                        setHoveredCell(i);
+                      }}
+                      onMouseLeave={(e) => {
+                        setHoveredCell(undefined);
                       }}
                     >
-                      PROFESOR
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      ASISTIO
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {profesores?.length > 0 && profesores?.map((row, i) => {
-              
-                    return (
-                      <TableRow
-                        key={`${row?.cedula}-${i}`}
-                        sx={{
-                          "&:last-child td, &:last-child th": {
-                            border: 0,
-                          },
-                          backgroundColor:
-                            hoveredCell !== undefined
-                              ? hoveredCell === i
-                                ? "rgba(153, 0, 0, 0.2)"
-                                : "white"
-                              : "white",
-                        }}
-                        onMouseEnter={(e) => {
-                          setHoveredCell(i);
-                        }}
-                        onMouseLeave={(e) => {
-                          setHoveredCell(undefined);
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}
-                        </TableCell>
-                        <TableCell>
-                          {row?.asistio?.trim() === 'SI' ? <CheckIcon
-                            style={{
-                              cursor: "pointer",
-                            }}
-                            onClick={(e) => {
+                      <TableCell component="th" scope="row">
+                        {`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}
+                      </TableCell>
+                      <TableCell>
+                        {row?.asistio?.trim() === 'SI' ? <CheckIcon
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                          
+                            const actualizarProfesor = async () => {
+                              try {
+                                const response = await fetch(
+                                  `${process.env.REACT_APP_SERVERURL}/profesor/${row?.cedula}`,
+                                  {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      cedula: row?.cedula,
+                                      facultadId: row?.facultad_id,
+                                      nombre1: row?.nombre1,
+                                      nombre2: row?.nombre2,
+                                      apellido1: row?.apellido1,
+                                      apellido2: row?.apellido2,
+                                      asistio: "NO",
+                                      imagen: row?.imagen
+                                    }),
+                                  }
+                                );
+                                if (response.status === 200) {
+                                  getProfesores();
+                                  getFacultades()
+                                  setCargando(false)
+                                }
+                              } catch (err) {
+                                console.log(err);
+                                setCargando(false)
+                              }
+                            };
+                                  
                             
-                              const actualizarProfesor = async () => {
-                                try {
-                                  const response = await fetch(
-                                    `${process.env.REACT_APP_SERVERURL}/profesor/${row?.cedula}`,
-                                    {
-                                      method: "PUT",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        cedula: row?.cedula,
-                                        facultadId: row?.facultad_id,
-                                        nombre1: row?.nombre1,
-                                        nombre2: row?.nombre2,
-                                        apellido1: row?.apellido1,
-                                        apellido2: row?.apellido2,
-                                        asistio: "NO",
-                                        imagen: row?.imagen
-                                      }),
-                                    }
-                                  );
-                                  if (response.status === 200) {
-                                    getProfesores();
-                                    getFacultades()
-                                    setCargando(false)
+                            setOpenAsistencia(false)
+                            setCargando(true)
+                            actualizarProfesor()
+                            setOpenAsistencia(true)
+                          }}
+                        /> : <CloseIcon
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            
+                            const actualizarProfesor = async () => {
+                              try {
+                                const response = await fetch(
+                                  `${process.env.REACT_APP_SERVERURL}/profesor/${row?.cedula}`,
+                                  {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      cedula: row?.cedula,
+                                      facultadId: row?.facultad_id,
+                                      nombre1: row?.nombre1,
+                                      nombre2: row?.nombre2,
+                                      apellido1: row?.apellido1,
+                                      apellido2: row?.apellido2,
+                                      asistio: "SI",
+                                      imagen: row?.imagen
+                                    }),
                                   }
-                                } catch (err) {
-                                  console.log(err);
+                                );
+                                if (response.status === 200) {
+                                  getProfesores();
+                                  getFacultades()
                                   setCargando(false)
                                 }
-                              };
-                                    
-                             
-                              setOpenAsistencia(false)
-                              setCargando(true)
-                              actualizarProfesor()
-                              setOpenAsistencia(true)
-                            }}
-                          /> : <CloseIcon
-                            style={{
-                              cursor: "pointer",
-                            }}
-                            onClick={(e) => {
-                              
-                              const actualizarProfesor = async () => {
-                                try {
-                                  const response = await fetch(
-                                    `${process.env.REACT_APP_SERVERURL}/profesor/${row?.cedula}`,
-                                    {
-                                      method: "PUT",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        cedula: row?.cedula,
-                                        facultadId: row?.facultad_id,
-                                        nombre1: row?.nombre1,
-                                        nombre2: row?.nombre2,
-                                        apellido1: row?.apellido1,
-                                        apellido2: row?.apellido2,
-                                        asistio: "SI",
-                                        imagen: row?.imagen
-                                      }),
-                                    }
-                                  );
-                                  if (response.status === 200) {
-                                    getProfesores();
-                                    getFacultades()
-                                    setCargando(false)
-                                  }
-                                } catch (err) {
-                                  console.log(err);
-                                  setCargando(false)
-                                }
-                              };
-                                       
-                         
-                              setOpenAsistencia(false)
-                              setCargando(true)
-                              actualizarProfesor()
-                              setOpenAsistencia(true)
-                            }}
-                          />}
-                                 
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer> : <Typography style={{textAlign: 'center'}}>NO HAY PROFESORES REGISTRADOS</Typography> }
-            <Button
+                              } catch (err) {
+                                console.log(err);
+                                setCargando(false)
+                              }
+                            };
+                                      
+                        
+                            setOpenAsistencia(false)
+                            setCargando(true)
+                            actualizarProfesor()
+                            setOpenAsistencia(true)
+                          }}
+                        />}
+                                
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+              </TableContainer> : <Typography style={{ textAlign: 'center' }}>NO HAY PROFESORES REGISTRADOS</Typography>
+          }            
+          <Button
                       type="submit"
                       fullWidth
                       style={{
@@ -901,7 +903,7 @@ const SeccionSorteo = (props) => {
               }}
                     >
                     SALIR
-                    </Button>
+            </Button>          
         </List>
       </Dialog>
     </>

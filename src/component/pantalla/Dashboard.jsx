@@ -224,11 +224,11 @@ export default function Dashboard(props) {
             {(cookies?.EMAIL &&
               cookies?.TOKEN &&
               cookies?.ALIAS &&
-              cookies?.ROL_ID) & cookies?.ROL_ID === 1 &&
+              cookies?.ROL_ID) & cookies?.ROL_ID === 1 ?
               <>
                 <Divider sx={{ my: 1 }} />
                 {secondaryListItems}
-              </>
+              </> : ''
             }
           </List>
         </Drawer>

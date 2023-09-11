@@ -224,7 +224,7 @@ const DialogUpdateUsuario = (props) => {
                 }
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={12}>
               <InputLabel>ALIAS</InputLabel>
               <TextField
                 fullWidth
@@ -237,37 +237,7 @@ const DialogUpdateUsuario = (props) => {
                   props?.modoDialogUpdateUsuario === "DELETE" ? true : false
                 }
               />
-            </Grid>
-           
-            <Grid item xs={12} sm={6}>
-              <InputLabel required>Facultad</InputLabel>
-              <Select
-                variant="outlined"
-                size="small"
-                id="rol"
-                name="rol"
-                fullWidth
-                defaultValue={
-                  props?.usuarioSeleccionado?.detalle_id ||
-                  (props?.roles?.length ? props?.roles[0]?.id : -1)
-                }
-                disabled={
-                  props?.modoDialogUpdateUsuario === "DELETE"
-                    ? true
-                    : false
-                }
-              >
-                {
-                  [{id: 1, nombre: 'ADMINISTRADOR'}, {id: 2, nombre:"GESTOR DE SORTEO"}]?.map((rol) => {
-                    return (
-                      <MenuItem key={rol?.id} value={rol?.id}>
-                        {rol?.nombre}
-                      </MenuItem>
-                    );
-                  })}
-              </Select>
-            </Grid>
-                
+            </Grid>                           
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
               <Button
                 sm={12}

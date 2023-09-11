@@ -64,6 +64,7 @@ const SeccionInicio = () => {
           xs={12}
           style={{            
             overflow: bitacora?.length ? "scroll" : "hidden",
+            maxHeight: `calc(100%)`,
           }}
         >
           {bitacora?.length ? (

@@ -164,6 +164,7 @@ export default function Landing(props) {
                     Iniciar Sesión
                   </Button>
                 </Grid>
+                {/*
                 <Grid
                   item
                   xs={12}
@@ -184,6 +185,7 @@ export default function Landing(props) {
                     Crear nuevo usuario
                   </Link>
                 </Grid>
+                  */}
               </Grid>
             </Box>
           </Box>

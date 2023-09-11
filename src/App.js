@@ -36,8 +36,15 @@ const App = () => {
               !cookies?.EMAIL &&
               !cookies?.TOKEN &&
               !cookies?.ALIAS &&
-              !cookies?.ROL_ID && (
+              !cookies?.ROL_ID ? (
                 <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Dashboard
+                  seccion="SeccionInicio"
                   setSeverity={setSeverity}
                   setMessage={setMessage}
                   setOpenSnackBar={setOpenSnackBar}

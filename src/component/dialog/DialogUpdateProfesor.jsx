@@ -322,8 +322,7 @@ const DialogUpdateProfesor = (props) => {
               <Grid container item xs={12} justifyContent={'center'} style={{ padding: 0, height: '30%', marginTop: 5 }}>
                 <Avatar
                   variant="rounded"
-                  sx={{ width: "30%", height: "30%", borderRadius: '50%' }}
-                  src={base64}
+                  sx={{ width: "15vw", height: "15vw", borderRadius: '50%' }}                  src={base64}
                   alt="logo-aso"
                 />
               </Grid>
