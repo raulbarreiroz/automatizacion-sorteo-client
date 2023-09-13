@@ -16,7 +16,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from '@mui/icons-material/Check';
@@ -29,7 +28,6 @@ const SeccionSorteo = (props) => {
   const [tiposDeDonaciones, setTiposDeDonaciones] = useState(undefined);
   const [sorteo, setSorteo] = useState([]);
   const [cargando, setCargando] = useState(false);
-  const [empezarSorteo, setEmpezarSorteo] = useState(undefined);
   const [tipoDeDonacionSeleccinado, setTipoDeDonacionSeleccionado] =
     useState(undefined);
   const [open, setOpen] = useState(false)
@@ -167,12 +165,6 @@ const SeccionSorteo = (props) => {
   }, [nombreRegalos])
 
   useEffect(() => {
-    if (tiposDeDonaciones?.length && facultades?.length && regalos?.length) {
-      setEmpezarSorteo(true);
-    }
-  }, [regalos, tiposDeDonaciones, facultades]);
-
-  useEffect(() => {
     console.log('facultades')
     console.log(facultades)
 
@@ -260,29 +252,29 @@ const SeccionSorteo = (props) => {
             <Grid container justifyContent={'flex-start'} alignItems={'flex-start'}  gap={1}>
               <Typography fontSize={27.5}>
                 {tiposDeDonaciones?.filter(t => t?.id === tipoDeDonacionSeleccinado)[0]?.nombre} 
-                { tipoDeDonacionSeleccinado !== 1 &&
-                <Select
-                  variant="outlined"
-                  size="small"
-                  id="facultad"
-                  name="facultad"
-                  fullWidth
-                    value={regaloSeleccionado}
-                    onChange={e => {
-                      setRegaloSeleccionado(e?.target?.value)
-                    }}
-                >
-                  {nombreRegalos?.length &&
-                    nombreRegalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado )?.map((regalo) => {
-                      return (
-                        <MenuItem key={regalo?.nombre} value={regalo?.nombre}>
-                          {regalo?.nombre}
-                        </MenuItem>
-                      );
-                    })}
-                </Select>}
-              </Typography>           
-             
+                {nombreRegalos?.length ?
+                  tipoDeDonacionSeleccinado !== 1 ?
+                    <Select
+                      variant="outlined"
+                      size="small"
+                      id="facultad"
+                      name="facultad"
+                      fullWidth
+                      value={regaloSeleccionado}
+                      onChange={e => {
+                        setRegaloSeleccionado(e?.target?.value)
+                      }}
+                    >
+                      {nombreRegalos?.length &&
+                        nombreRegalos?.filter(regalo => regalo?.tipo_donacion_id === tipoDeDonacionSeleccinado)?.map((regalo) => {
+                          return (
+                            <MenuItem key={regalo?.nombre} value={regalo?.nombre || ''}>
+                              {regalo?.nombre}
+                            </MenuItem>
+                          );
+                        })}
+                    </Select> : '' : <Typography>NO SE HA DONADO REGALOS PARA ESTE TIPO DE SORTEO</Typography>}              
+             </Typography>
               <Button 
                 variant="outlined"  
                 size="small"

@@ -20,6 +20,8 @@ import PublishIcon from "@mui/icons-material/Publish";
 import Visualizador from "../Visualizador";
 import imagenNoDisponible from "../../resources/imagen/imagen no disponible.jpg"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const SeccionProfesores = (props) => {
   const [cargando, setCargando] = useState(false);
@@ -185,7 +187,30 @@ const SeccionProfesores = (props) => {
                         color: "white",
                       }}
                     >
-                      ASISTIO
+                      {                                                
+                        <Select
+                          defaultValue={'SI'}
+                          style={{
+                            color: 'white',
+                            border: '0px solid transparent'
+                          }}
+                          fullWidth
+                        >
+                          {
+                            [
+                              { id: 0, value: 'SI' },
+                              { id: 1, value: 'NO' },
+                              { id: -1, value: 'TODOS' }
+                            ]?.map((asistio, i) => {
+                              return (
+                                <MenuItem key={i} value={asistio?.id}>
+                                  {asistio?.value}
+                                </MenuItem>
+                              );
+                            })
+                          }
+                        </Select>                        
+                      }
                     </TableCell>
                     <TableCell
                       style={{
