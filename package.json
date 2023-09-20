@@ -19,6 +19,7 @@
     "react-card-flip": "^1.2.0",
     "react-color": "^2.19.3",
     "react-cookie": "^6.1.0",
+    "react-custom-roulette": "^1.4.1",
     "react-dom": "^18.2.0",
     "react-image-file-resizer": "^0.4.8",
     "react-router-dom": "^6.15.0",

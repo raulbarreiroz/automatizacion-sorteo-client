@@ -68,6 +68,8 @@ const DialogUpdateRegalo = (props) => {
     const directores = props?.directores
     const tiposDeDonaciones = props?.tiposDeDonaciones
     
+    setImagenSeleccionda('')
+
     if (tipoDonacionSeleccionada === 1) {      
       if (tipoDeAutoridadSeleccionada === 2 && facultades?.length && decanos?.length) {
         const decanoId = (facultades?.filter(facultad => facultad?.id === facultadSelccionada)[0]?.decano_id)

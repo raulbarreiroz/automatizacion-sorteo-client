@@ -24,6 +24,7 @@ import SeccionFacultades from "../seccion/SeccionFacultades";
 import SeccionCarreras from "../seccion/SeccionCarreras";
 import SeccionTipoDonacion from "../seccion/SeccionTipoDonacion";
 import SeccionInicio from '../seccion/SeccionInicio'
+import SeccionAutoridades from "../seccion/SeccionAutoridades";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import Link from "@mui/material/Link";
@@ -270,11 +271,13 @@ export default function Dashboard(props) {
                 <SeccionSorteo setOpen={setOpen} />
               )}
               {seccion === "SeccionProfesores" && <SeccionProfesores />}
+              {seccion === "SeccionAutoridades" && <SeccionAutoridades />}
               {seccion === "SeccionRegalos" && <SeccionRegalos />}
               {seccion === "SeccionUsuarios" && <SeccionUsuarios />}
               {seccion === "SeccionFacultades" && <SeccionFacultades />}
               {seccion === "SeccionCarreras" && <SeccionCarreras />}
               {seccion === "SeccionTipoDonacion" && <SeccionTipoDonacion />}
+
             </Container>
             <Grid
               style={{

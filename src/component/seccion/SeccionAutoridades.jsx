@@ -12,77 +12,62 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DialogUpdateProfesor from "../dialog/DialogUpdateProfesor";
+import DialogUpdateAutoridad from "../dialog/DialogUpdateAutoridad";
 import Carga from "../Carga";
-import DialogUsarArchivoProfesor from "../dialog/DialogUsarArchivoProfesor";
-import SaveAsIcon from "@mui/icons-material/SaveAs";
-import PublishIcon from "@mui/icons-material/Publish";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Tooltip from '@mui/material/Tooltip';
 import Visualizador from "../Visualizador";
+import Select from "@mui/material/Select"
+import MenuItem from "@mui/material/MenuItem"
 
-const SeccionProfesores = (props) => {
+const SeccionAutoridades = (props) => {
   const [cargando, setCargando] = useState(false);
   const gridBotones = useRef(undefined);
-  const [modoDialogUpdateProfesor, setModoDialogUpdateProfesor] =
+  const [modoDialogUpdateAutoridad, setModoDialogUpdateAutoridad] =
     useState(undefined);
   const [hoveredCell, setHoveredCell] = useState(undefined);
-  const [mostrarDialogUpdateProfesor, setMostrarDialogUpdateProfesor] =
-    useState(false);  
-  const [mostrarDialogUsarArchivo, setMostrarDialogUsarArchivo] =
-    useState(false);
-  const [profesorSeleccionado, setProfesorSeleccionado] = useState(undefined);
-  const [profesores, setProfesores] = useState(undefined);
-  const [cabeceraId] = useState(12); // cabecera de catalogo de facultad
+  const [mostrarDialogUpdateAutoridad, setMostrarDialogUpdateAutoridad] =
+    useState(false);    
+  const [autoridadSeleccionada, setAutoridadSeleccionada] = useState(undefined);
+  const [autoridades, setAutoridades] = useState(undefined);  
+  const [autoridadesFiltradas, setAutoridadesFiltradas] = useState(undefined)
   const [facultades, setFacultades] = useState(undefined);
-  const [cedulas, setCedulas] = useState(undefined);  
+  const [carreras, setCarreras] = useState(undefined)    
   const [openVisualizador, setOpenVisualizador] = useState(false)
-  const [imagenVisualizador, setImagenVisualizador] = useState(undefined)
-  const getProfesores = useCallback(async () => {
+  const [imagenVisualizador, setImagenVisualizador] = useState(undefined)  
+  const [tipoDeAutoridadSeleccionada, setTipoDeAutoridadSeleccionada] = useState(undefined)
+  const getAutoridades = useCallback(async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/profesores`
-      );
-      const profesores = await response.json();
-
-      if (profesores?.length) {
-        setProfesores(profesores);
-        const cedulas = profesores?.map((profesor) => profesor?.cedula);
-        setCedulas(cedulas?.length ? cedulas : []);
+        `${process.env.REACT_APP_SERVERURL}/autoridades`
+      );            
+      const autoridades = await response.json();
+      if (autoridades?.length) {
+        setAutoridades(autoridades);
+        setTipoDeAutoridadSeleccionada(autoridades[0]?.id)
       } else {
-        setProfesores([]);
-        setCedulas([]);
+        setAutoridades([]);
+        setTipoDeAutoridadSeleccionada('')
       }
+      setCargando(false);
     } catch (err) {
       console.log(err);
-      setProfesores([]);
-      setCedulas([]);
-    }
-    setCargando(false);
-  }, []);
-  const getFacultades = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/facultades`
-      );
-      const facultades = await response.json();
-      if (facultades?.length) {
-        setFacultades(facultades);
-      } else {
-        setFacultades([]);
-      }
-    } catch (err) {
-      console.log(err);
-      setFacultades([]);
-    }
-    setCargando(false);
+      setAutoridades([]);
+      setTipoDeAutoridadSeleccionada('')
+      setCargando(false);
+    }    
   }, []);
   
-  useEffect(() => {
+  useEffect(() => {    
     setCargando(true);
-    getFacultades();
-    getProfesores();
-  }, [getProfesores, getFacultades]);
+    getAutoridades()    
+  }, [getAutoridades]);
+
+  useEffect(() => {
+    if (tipoDeAutoridadSeleccionada && autoridades?.length) {      
+      setAutoridadesFiltradas(autoridades?.filter(a => a?.id === tipoDeAutoridadSeleccionada)[0]?.detalles)
+    }
+  }, [tipoDeAutoridadSeleccionada, autoridades])
 
   return (
     <>
@@ -93,40 +78,61 @@ const SeccionProfesores = (props) => {
           padding: "2.5vh 1.5vw",
         }}
       >
-        <Grid  width={'100%'} ref={gridBotones} container justifyContent={"flex-start"}>
-          
-          <Grid container item xs={12}>
-            <Grid item xs={12} sm={4} md={2}>
-              <Button
-                variant="outlined"
-                startIcon={<SchoolIcon />}
-                endIcon={<AddIcon />}
-                sx={{ mb: 2 }}
-                onClick={(e) => {
-                  setMostrarDialogUpdateProfesor(true);
-                  setModoDialogUpdateProfesor("ADD");
-                  setProfesorSeleccionado(undefined);
-                }}
-                fullWidth
-              >
-                Profesor
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button
-                variant="outlined"
-                sx={{ mb: 2, ml: 2 }}
-            
-                startIcon={<SaveAsIcon />}
-                endIcon={<PublishIcon />}
-                onClick={(e) => {
-                  setMostrarDialogUsarArchivo(true);
-                }}
-              >
-                Usar archivo
-              </Button>
-              </Grid>
-            </Grid>                    
+        <Grid
+          width={'100%'}
+          ref={gridBotones}
+          container justifyContent={"flex-start"}          
+          columnGap={1}
+        >         
+          <Grid item xs={12} sm={7} >
+            {autoridades?.length > 0 ?              
+                <Select
+                  sx={{
+                    p: 0,
+                    m: 0,
+                    mb: 2,
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  id="cabecera-select"
+                  value={tipoDeAutoridadSeleccionada}
+                  onChange={e => {
+                    console.log(e?.target?.value)
+                    setTipoDeAutoridadSeleccionada(e?.target?.value)
+                  }}
+                >
+                  {
+                    autoridades?.length &&
+                    autoridades?.map((autoridad, i) => {
+                      return (
+                        <MenuItem key={i} value={autoridad?.id}>
+                          {autoridad?.nombre}
+                        </MenuItem>
+                      );
+                    })
+                  }
+                </Select>
+               : ''
+            }
+          </Grid>
+          <Grid  item xs={12} sm={4} md={2}>
+            <Button
+              variant="outlined"
+              startIcon={<SchoolIcon />}
+              endIcon={<AddIcon />}
+              sx={{ mb: 2 }}
+              size="large"
+              onClick={(e) => {
+                setMostrarDialogUpdateAutoridad(true);
+                setModoDialogUpdateAutoridad("ADD");
+                setAutoridadSeleccionada(undefined);
+              }}
+              fullWidth
+            >
+              Autoridad
+            </Button>
+          </Grid>                                          
         </Grid>
 
         <Grid
@@ -134,10 +140,10 @@ const SeccionProfesores = (props) => {
           xs={12}
           style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: profesores?.length ? "scroll" : "hidden",
+            overflow: autoridades?.length ? "scroll" : "hidden",
           }}
-        >
-          {profesores?.length ? (
+        >          
+          {autoridadesFiltradas?.length ? (
             <TableContainer
               component={Paper}
               style={{
@@ -210,7 +216,7 @@ const SeccionProfesores = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {profesores.map((row, i) => {
+                  {autoridades.map((row, i) => {
                     return (
                       <TableRow
                         key={`${row?.cedula}-${i}`}
@@ -274,9 +280,9 @@ const SeccionProfesores = (props) => {
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateProfesor(true);
-                              setModoDialogUpdateProfesor("EDIT");
-                              setProfesorSeleccionado(row);
+                              setMostrarDialogUpdateAutoridad(true);
+                              setModoDialogUpdateAutoridad("EDIT");
+                              setAutoridadSeleccionada(row);
                             }}
                           />
                         </TableCell>
@@ -286,9 +292,9 @@ const SeccionProfesores = (props) => {
                               cursor: "pointer",
                             }}
                             onClick={(e) => {
-                              setMostrarDialogUpdateProfesor(true);
-                              setModoDialogUpdateProfesor("DELETE");
-                              setProfesorSeleccionado(row);
+                              setMostrarDialogUpdateAutoridad(true);
+                              setModoDialogUpdateAutoridad("DELETE");
+                              setAutoridadSeleccionada(row);
                             }}
                           />
                         </TableCell>
@@ -310,28 +316,16 @@ const SeccionProfesores = (props) => {
           )}
         </Grid>
       </Paper>
-      <DialogUpdateProfesor
-        mostrarDialogUpdateProfesor={mostrarDialogUpdateProfesor}
-        setMostrarDialogUpdateProfesor={setMostrarDialogUpdateProfesor}
-        modoDialogUpdateProfesor={modoDialogUpdateProfesor}
-        setModoDialogUpdateProfesor={setModoDialogUpdateProfesor}
-        profesorSeleccionado={profesorSeleccionado}
+      <DialogUpdateAutoridad
+        mostrarDialogUpdateAutoridad={mostrarDialogUpdateAutoridad}
+        setMostrarDialogUpdateAutoridad={setMostrarDialogUpdateAutoridad}
+        modoDialogUpdateAutoridad={modoDialogUpdateAutoridad}
+        setModoDialogUpdateAutoridad={setModoDialogUpdateAutoridad}
+        autoridadSeleccionada={autoridadSeleccionada}
+        autoridades={autoridades}
         facultades={facultades}
-        setCargando={setCargando}
-        getProfesores={getProfesores}
-        cabeceraId={cabeceraId}
-        cedulas={cedulas}
-      />
-      <DialogUsarArchivoProfesor
-        cedulas={cedulas}
-        mostrarDialogUsarArchivo={mostrarDialogUsarArchivo}
-        setMostrarDialogUsarArchivo={setMostrarDialogUsarArchivo}
-        facultades={facultades}
-        cabeceraId={cabeceraId}
-        setCargando={setCargando}
-        getProfesores={getProfesores}
-      />
-      
+        setCargando={setCargando}                        
+      />      
       <Carga cargando={cargando} />
       {
         openVisualizador &&
@@ -345,4 +339,4 @@ const SeccionProfesores = (props) => {
   );
 };
 
-export default SeccionProfesores;
+export default SeccionAutoridades;

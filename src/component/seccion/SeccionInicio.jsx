@@ -177,7 +177,7 @@ const SeccionInicio = () => {
         }}
       >
         <Grid  width={'100%'} ref={gridBotones}>          
-          <Grid container item xs={12} justifyContent={'space-between'}>            
+          <Grid container item xs={12} justifyContent={'space-between'} alignItems={'center'}>            
             <Grid item xs={12} sm={6}>              
               {fechaBitacoraSeleccionada ?
                 <Grid container width={'100%'}>
@@ -213,23 +213,25 @@ const SeccionInicio = () => {
                   : ''                
               }
             </Grid>
-            <Grid item xs={12} sm={5} md={3} mb={2}>
-              <Button
-                variant="outlined"
-                startIcon={<CasinoIcon />}
-                endIcon={<CloudDownloadIcon style={{
-                  transform: 'scale(1.2)'
-                }} />}
-                fullWidth
-                onClick={e => {
-                  e?.preventDefault()
-                  setCargando(true)
-                  generarArchivoBitacora(bitacoraFiltrada, fechaBitacoraSeleccionada)
-                }}
-              >
-                EXPORTAR
-              </Button>
-            </Grid>
+            {bitacoraFiltrada?.length > 0 &&
+              <Grid item xs={12} sm={5} md={3} mb={2}>
+                <Button
+                  variant="outlined"
+                  startIcon={<CasinoIcon />}
+                  endIcon={<CloudDownloadIcon style={{
+                    transform: 'scale(1.2)'
+                  }} />}
+                  fullWidth
+                  onClick={e => {
+                    e?.preventDefault()
+                    setCargando(true)
+                    generarArchivoBitacora(bitacoraFiltrada, fechaBitacoraSeleccionada)
+                  }}
+                >
+                  EXPORTAR
+                </Button>
+              </Grid>
+            }
           </Grid>
         </Grid>
         <Grid

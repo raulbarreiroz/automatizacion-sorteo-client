@@ -15,6 +15,7 @@ import { NavLink } from "react-router-dom";
 import ReorderIcon from '@mui/icons-material/Reorder';
 import HomeIcon from '@mui/icons-material/Home';
 import { Home } from "@mui/icons-material";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 const style = {
   color: "black",
@@ -50,6 +51,14 @@ export const secondaryListItems = (
           <SchoolIcon />
         </ListItemIcon>
         <ListItemText primary="Profesores" />
+      </ListItemButton>
+    </NavLink>
+    <NavLink to="/dashboard/autoridades" style={style}>
+      <ListItemButton>
+        <ListItemIcon>
+          <AccountBoxIcon />
+        </ListItemIcon>
+        <ListItemText primary="Autoridades" />
       </ListItemButton>
     </NavLink>
     <NavLink to="/dashboard/facultades" style={style}>

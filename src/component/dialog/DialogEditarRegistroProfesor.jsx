@@ -24,15 +24,8 @@ import { Co2Sharp } from "@mui/icons-material";
 const DialogEditarRegistroProfesor = (props) => {
   const [mensajesSeleccionados, setMensajesSeleccionado] = useState(undefined);
   const [campo, setCampo] = useState("");  
-  useEffect(() => {
-    console.log('campo')
-    console.log(campo)
-  }, [campo])
   
-  useEffect(() => {
-    console.log('props')
-    console.log(props)
-
+  useEffect(() => {    
     if (props?.rowSeleccionado) {
       setCampo(
         props?.rowSeleccionado[props?.campoPorEditarDialogEditarRegistro]
@@ -211,10 +204,7 @@ const DialogEditarRegistroProfesor = (props) => {
                   setCampo(e?.target?.value);
                 }}
               >
-                {props?.facultades?.map((facultad) => {
-                  console.log('campo: ', campo)
-                  console.log('facultad')
-                  console.log(facultad)
+                {props?.facultades?.map((facultad) => {                  
                   return (
                     <MenuItem
                       key={`$${facultad?.id}-{facultad?.cabecera_id}-${facultad?.detalle_id}`}

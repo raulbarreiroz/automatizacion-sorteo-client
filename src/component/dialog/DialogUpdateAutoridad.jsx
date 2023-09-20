@@ -17,75 +17,29 @@ import { decode as base64_decode, encode as base64_encode } from 'base-64';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import Visualizador from "../Visualizador";
 
-const DialogUpdateProfesor = (props) => {
+const DialogUpdateAutoridad = (props) => {
   const inputRef = useRef(undefined);
   const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
-  const [textFieldCedula, setTextFieldCedula] = useState(undefined);
-  const [textFieldCedulaError, setTextFieldCedulaError] = useState(undefined)
-  const [textFieldNombre1, setTextFieldNombre1] = useState(undefined)
-  const [textFieldNombre2, setTextFieldNombre2] = useState(undefined)
-  const [textFieldApellido1, setTextFieldApellido1] = useState(undefined)
-  const [textFieldApellido2, setTextFieldApellido2] = useState(undefined)
-  const [facultadSeleccionada, setFacultadSeleccionada] = useState(undefined)
+  const [textFieldNombre, setTextFieldNombre] = useState(undefined)  
+  const [textFieldDescripcion, setTextFieldDescripcion] = useState(undefined)
+  const [facultades, setFacultades] = useState(undefined)
   const [base64, setBase64] = useState(undefined)
   const [openVisualizador, setOpenVisualizador] = useState(false)
-  const [autoridades, setAutoridades] = useState(undefined)
+  const [tipoDeAutoridadSeleccionada, setTipoDeAutoridadSeleccionada] = useState(undefined)
 
-  useEffect(() => {    
-    if (props?.mostrarDialogUpdateProfesor) { 
-      console.log(props)
-      setTextFieldCedula(props?.profesorSeleccionado?.cedula || "");
-      setTextFieldNombre1(props?.profesorSeleccionado?.nombre1 || "");
-      setTextFieldNombre2(props?.profesorSeleccionado?.nombre2 || "");
-      setTextFieldApellido1(props?.profesorSeleccionado?.apellido1 || "");
-      setTextFieldApellido2(props?.profesorSeleccionado?.apellido2 || "");
-      setImagenSeleccionda(props?.profesorSeleccionado?.imagen_seleccionada || "")
-      setBase64(props?.profesorSeleccionado?.imagen || '')
-      const facultades = props?.facultades || []
-      setFacultadSeleccionada(facultades[0]?.id || '')
+  useEffect(() => {            
+    if (props?.mostrarDialogUpdateAutoridad) {       
+      setTextFieldNombre(props?.autoridadSeleccionada?.nombre1 || "");      
+      setImagenSeleccionda(props?.autoridadSeleccionada?.imagen_seleccionada || "")
+      setBase64(props?.autoridadSeleccionada?.imagen || '')
+      const facultades = props?.facultades || []      
     } else {
-      setTextFieldCedula("");
-      setTextFieldNombre1("");
-      setTextFieldNombre2("");
-      setTextFieldApellido1("");
-      setTextFieldApellido2("");
+      setTextFieldNombre(undefined)
       setImagenSeleccionda(undefined)
-      setBase64('')      
-      setFacultadSeleccionada('')      
+      setBase64('')                 
     }
   }, [props]);
-
-  useEffect(() => {
-    const modoDialogUpdateProfesor = props?.modoDialogUpdateProfesor;
-    const profesorSeleccionado = props?.profesorSeleccionado;
-
-    if (modoDialogUpdateProfesor === "ADD") {
-      if (
-        props?.cedulas?.filter((cedula) => cedula === textFieldCedula)?.length >
-        0
-      ) {
-        setTextFieldCedulaError(true);
-      } else {
-        setTextFieldCedulaError(false);
-      }
-    } else if (modoDialogUpdateProfesor === "EDIT") {
-      if (
-        props?.cedulas?.filter((cedula) => cedula === textFieldCedula)?.length >
-        0
-      ) {
-        if (profesorSeleccionado?.cedula !== textFieldCedula) {
-          setTextFieldCedulaError(true);
-        } else {
-          setTextFieldCedulaError(false);
-        }
-      } else {
-        setTextFieldCedulaError(false);
-      }
-    } else {
-      setTextFieldCedulaError(false);
-    }
-  }, [textFieldCedula, props]);
-  
+   
   useEffect(() => {
     const resizeFile = (file) =>
       new Promise((resolve) => {
@@ -116,71 +70,63 @@ const DialogUpdateProfesor = (props) => {
 
 
   const handleSubmit = (event) => {
-    props?.setMostrarDialogUpdateProfesor(false);
-    const crearProfesor = async () => {      
+    props?.setMostrarDialogUpdateAutoridad(false);
+    const crearAutoridad = async () => {      
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/profesor`,
+          `${process.env.REACT_APP_SERVERURL}/autoridad`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              cedula: textFieldCedula,
-              facultadId: facultadSeleccionada,
-              nombre1: textFieldNombre1,
-              nombre2: textFieldNombre2,
-              apellido1: textFieldApellido1,
-              apellido2: textFieldApellido2,
+              nombre: textFieldNombre,
+              descripcion: textFieldDescripcion,
               imagen: base64
             }),
           }
         );
         if (response.status === 200) {          
-          props?.getProfesores();
+          props?.getAutoridades();
         }
       } catch (err) {
         console.log(err);
       }
     };
 
-    const actualizarProfesor = async () => {    
+    const actualizarAutoridad = async () => {    
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.cedula}`,
+          `${process.env.REACT_APP_SERVERURL}/autoridad/${props?.autoridadSeleccionada?.cedula}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              cedula: textFieldCedula,
-              facultadId: facultadSeleccionada,
-              nombre1: textFieldNombre1,
-              nombre2: textFieldNombre2,
-              apellido1: textFieldApellido1,
-              apellido2: textFieldApellido2,
+              nombre: textFieldNombre,
+              descripcion: textFieldDescripcion,              
               imagen: base64,              
-              asistio: props?.profesorSeleccionado?.asistio
+              asistio: props?.autoridadSeleccionada?.asistio
             }),
           }
         );
         if (response.status === 200) {
-          props?.getProfesores();
+          props?.getAutoridades();
         }
       } catch (err) {
         console.log(err);
       }
     };
 
-    const borrarProfesor = async () => {
+    const borrarAutoridad = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_SERVERURL}/profesor/${props?.profesorSeleccionado?.cedula}`,
+          `${process.env.REACT_APP_SERVERURL}/autoridad/${props?.autoridadSeleccionada?.cedula}`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
           }
         );
         if (response.status === 200) {
-          props?.getProfesores();
+          props?.getAutoridades();
         }
       } catch (err) {
         console.log(err);
@@ -190,47 +136,14 @@ const DialogUpdateProfesor = (props) => {
     event.preventDefault();
 
     props?.setCargando(true);
-    if (props?.modoDialogUpdateProfesor === "ADD") crearProfesor();
-    else if (props?.modoDialogUpdateProfesor === "EDIT") actualizarProfesor();
-    else if (props?.modoDialogUpdateProfesor === "DELETE") borrarProfesor();
-  };
-  
-  const cadenaEsNumerica = (cadena) => {    
-    let esNumerica = true
-    const longitud = cadena?.length
-    for (let i = 0; i < longitud; i++) {      
-      if (isNaN(cadena?.charAt(i))) {
-        esNumerica = false
-      }
-    }
-
-    return esNumerica
-  }
-
-  const cadenaSoloLetras = (cadena) => {
-    let soloLetras = true
-    const longitud = cadena?.length
-    for (let i = 0; i < longitud; i++) {
-      if (!isNaN(cadena?.charAt(i))) {
-        soloLetras = false
-      }
-    }
-    return soloLetras
-  }
-
-  const capitalizarCadena = cadena => {
-    let cadenaModificada = cadena    
-    if (cadena === 1) {            
-      cadenaModificada = cadena?.charAt(0)?.toUpperCase()
-    } else {
-      cadenaModificada = `${cadena?.charAt(0)?.toUpperCase()}${cadena?.slice(1, cadena?.length)?.toLowerCase()}`
-    }
-    return cadenaModificada
-  }
+    if (props?.modoDialogUpdateAutoridad === "ADD") crearAutoridad();
+    else if (props?.modoDialogUpdateAutoridad === "EDIT") actualizarAutoridad();
+    else if (props?.modoDialogUpdateAutoridad === "DELETE") borrarAutoridad();
+  };    
 
   return (
     <>
-      <Dialog fullWidth maxWidth={"sm"} open={props.mostrarDialogUpdateProfesor}>
+      <Dialog fullWidth maxWidth={"lg"} open={props.mostrarDialogUpdateAutoridad}>
         <DialogTitle
           style={{
             display: "flex",
@@ -239,10 +152,10 @@ const DialogUpdateProfesor = (props) => {
           }}
         >
           <div>
-            {props?.modoDialogUpdateProfesor === "ADD" ? (
-              <Typography>{`AÑADIR NUEVO PROFESOR`}</Typography>
-            ) : props?.modoDialogUpdateProfesor === "EDIT" ? (
-              <Typography>EDITAR PROFESOR</Typography>
+            {props?.modoDialogUpdateAutoridad === "ADD" ? (
+              <Typography>{`AÑADIR NUEVA AUTORIDAD`}</Typography>
+            ) : props?.modoDialogUpdateAutoridad === "EDIT" ? (
+              <Typography>EDITAR AUTORIDAD</Typography>
             ) : (
               <div
                 style={{
@@ -260,14 +173,14 @@ const DialogUpdateProfesor = (props) => {
                     marginLeft: 5,
                   }}
                 >
-                  EL PROFESOR SERÁ ELIMINADO
+                  LA AUTORIDAD SERÁ ELIMINADO
                 </Typography>
               </div>
             )}
           </div>
           <Button
             onClick={(e) => {
-              props?.setMostrarDialogUpdateProfesor(false);
+              props?.setMostrarDialogUpdateAutoridad(false);
               setImagenSeleccionda(undefined)
             }}
           >
@@ -283,27 +196,21 @@ const DialogUpdateProfesor = (props) => {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <InputLabel required>Cédula</InputLabel>
+                <InputLabel required>NOMBRE</InputLabel>
                 <TextField
                   required
                   fullWidth                  
                   size="small"
-                  value={textFieldCedula}
+                  value={textFieldNombre}
                   onChange={(e) => {                  
-                    if (e?.target?.value?.length <= 10 && cadenaEsNumerica(e?.target?.value)) {                    
-                      setTextFieldCedula(e?.target?.value);
+                    if (e?.target?.value?.length <= 50) {                    
+                      setTextFieldNombre(e?.target?.value);
                     }
-                  }}                  
-                  helperText={
-                    textFieldCedulaError
-                      ? "OTRO PROFESOR YA TIENE REGISTRADA LA CÉDULA INGRESADA"
-                      : ""
-                  }
+                  }}                                    
                   disabled={
-                        props?.modoDialogUpdateProfesor === "DELETE" || props?.modoDialogUpdateProfesor === 'EDIT'
+                        props?.modoDialogUpdateAutoridad === "DELETE" 
                           ? true                        
-                          : false
-                          
+                          : false                          
                       }
                 />
               </Grid>
@@ -348,7 +255,7 @@ const DialogUpdateProfesor = (props) => {
                         component="span"
                         fullWidth
                         disabled={
-                          props?.modoDialogUpdateProfesor === "DELETE"
+                          props?.modoDialogUpdateAutoridad === "DELETE"
                             ? true                        
                             : false
                             
@@ -370,7 +277,7 @@ const DialogUpdateProfesor = (props) => {
                     }}
                   >                    
                     <Grid sx={{width:'88%'}}>
-                      <TextField size="small" style={{ width: '100%' }} required disabled value={base64 && imagenSeleccionada?.name ? imagenSeleccionada?.name : 'IMAGEN DE PROFESOR'} />
+                      <TextField size="small" style={{ width: '100%' }} required disabled value={base64 && imagenSeleccionada?.name ? imagenSeleccionada?.name : 'IMAGEN DE AUTORIDAD'} />
                     </Grid>
                     <Grid sx={{width: '10%'}}>
                     <CloseIcon
@@ -390,83 +297,37 @@ const DialogUpdateProfesor = (props) => {
                   </Grid>
                 }
               </Grid>                                              
-              <Grid item xs={12} sm={6}>
-                <InputLabel required>Primer nombre</InputLabel>
+              <Grid item xs={12}>
+                <InputLabel required>DESCRIPCION</InputLabel>
                 <TextField
                   size="small"
-                  fullWidth                  
-                  value={textFieldNombre1}
+                  fullWidth  
+                  multiline                  
+                  value={textFieldDescripcion}
                   onChange={e => {
                     const value = e?.target?.value
-                    if (value?.length <= 50 && cadenaSoloLetras(value))
-                      setTextFieldNombre1(capitalizarCadena(value))
+                    if (value?.length <= 250)
+                      setTextFieldDescripcion(value)
                   }}
                   disabled={
-                    props?.modoDialogUpdateProfesor === "DELETE" ? true : false
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <InputLabel>Segundo nombre</InputLabel>
-                <TextField
-                  fullWidth
-                  size="small"                  
-                  value={textFieldNombre2}
-                  onChange={e => {
-                    const value = e?.target?.value
-                    if (value?.length <= 50 && cadenaSoloLetras(value))
-                      setTextFieldNombre2(capitalizarCadena(value))
-                  }}
-                  disabled={
-                    props?.modoDialogUpdateProfesor === "DELETE" ? true : false
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <InputLabel required>Primer apellido</InputLabel>
-                <TextField
-                  size="small"
-                  fullWidth   
-                  value={textFieldApellido1}
-                  onChange={e => {
-                    const value = e?.target?.value
-                    if (value?.length <= 50 && cadenaSoloLetras(value))
-                      setTextFieldApellido1(capitalizarCadena(value))
-                  }}
-                  disabled={
-                    props?.modoDialogUpdateProfesor === "DELETE" ? true : false
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <InputLabel required>Segundo apellido</InputLabel>
-                <TextField
-                  fullWidth
-                  size="small"                  
-                  value={textFieldApellido2}
-                  onChange={e => {
-                    const value = e?.target?.value
-                    if (value?.length <= 50 && cadenaSoloLetras(value))
-                      setTextFieldApellido2(capitalizarCadena(value))
-                  }}
-                  disabled={
-                    props?.modoDialogUpdateProfesor === "DELETE" ? true : false
+                    props?.modoDialogUpdateAutoridad === "DELETE" ? true : false
                   }
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
-                <InputLabel required>Facultad</InputLabel>
+                <InputLabel required>TIPO DE AUTORIDADES</InputLabel>
                   <Grid container>
-                  {props?.facultades?.length > 0 ?
+                  {props?.tiposDeAutoridades?.length > 0 ?
                     <Grid item xs={12}>
-                      {props?.facultades && props?.facultades?.length > 0 &&
+                      {props?.tiposDeAutoridades && props?.tiposDeAutoridades?.length > 0 &&
                         <Select
                           variant="outlined"
                           size="small"
                           fullWidth
-                          value={facultadSeleccionada}
+                          value={tipoDeAutoridadSeleccionada}
                           onChange={e => {
-                            setFacultadSeleccionada(e?.target?.value)
+                            setTipoDeAutoridadSeleccionada
+                              (e?.target?.value)
                           }}
                           disabled={
                             props?.modoDialogUpdateProfesor === "DELETE"
@@ -485,7 +346,7 @@ const DialogUpdateProfesor = (props) => {
                               );
                             })}
                         </Select>}
-                    </Grid> : 'NO EXISTEN FACULTADES REGISTRADAS'
+                    </Grid> : 'NO EXISTEN TIPOS DE AUTORIDADES REGISTRADAS'
                   }
                   </Grid>
                 </Grid> 
@@ -499,27 +360,17 @@ const DialogUpdateProfesor = (props) => {
                     width: "100%",
                   }}
                   disabled={
-                    props?.modoDialogUpdateProfesor !== 'DELETE' ?                    
-                    textFieldCedula?.length === 10 &&
-                      textFieldNombre1 !== '' &&
-                      textFieldApellido1 !== '' &&
-                        textFieldApellido2 !== '' && 
-                        facultadSeleccionada
+                    props?.modoDialogUpdateAutoridad !== 'DELETE' ?                                        
+                      textFieldNombre !== ''                      
                     ? false : true                     
                   : false}
                 >
-                  {props?.modoDialogUpdateProfesor === "ADD"
-                    ? textFieldCedula?.length === 10 &&
-                      textFieldNombre1 !== '' &&
-                      textFieldApellido1 !== '' &&
-                      textFieldApellido2 !== '' &&
-                      facultadSeleccionada
+                  {props?.modoDialogUpdateAutoridad === "ADD"
+                    ? 
+                      textFieldNombre !== ''                      
                     ?  "GUARDAR" : 'DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS' 
-                    : props?.modoDialogUpdateProfesor === "EDIT"
-                    ? textFieldNombre1 !== '' &&
-                    textFieldApellido1 !== '' &&
-                        textFieldApellido2 !== '' &&
-                        facultadSeleccionada
+                    : props?.modoDialogUpdateAutoridad === "EDIT"
+                    ? textFieldNombre !== ''                    
                   ?  "GUARDAR" : 'DEBE LLENAR TODOS LOS CAMPOS OBLIGATORIOS' 
                     : "ELIMINAR"}
                 </Button>
@@ -540,4 +391,4 @@ const DialogUpdateProfesor = (props) => {
   );
 };
 
-export default DialogUpdateProfesor;
+export default DialogUpdateAutoridad;

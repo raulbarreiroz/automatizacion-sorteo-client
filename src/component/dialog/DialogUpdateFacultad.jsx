@@ -10,7 +10,6 @@ import Typography from "@mui/material/Typography";
 import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useEffect, useState, useRef } from "react";
-import Chip from '@mui/material/Chip';
 import { SketchPicker } from 'react-color'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -21,10 +20,8 @@ const DialogUpdateFacultad = (props) => {
   const inputRef = useRef(undefined);
   const [imagenSeleccionada, setImagenSeleccionda] = useState(undefined);
   const [base64, setBase64] = useState(undefined)
-  const [textFieldNombre, setTextFieldNombre] = useState(undefined);
-  const [textFieldNombreError, setTextFieldNombreError] = useState(false);
-  const [textFieldDecanoNombre, setTextFieldDecanoNombre] = useState(undefined);
-  const [textFieldDecanoNombreError, setTextFieldDecanoNombreError] = useState(false);
+  const [textFieldNombre, setTextFieldNombre] = useState(undefined);  
+  
   const [color, setColor] = useState({
     "hsl": {
       "h": 249.99999999999994,
@@ -52,11 +49,6 @@ const DialogUpdateFacultad = (props) => {
   const [carreras, setCarreras] = useState(undefined)
 
   useEffect(() => {
-    console.log('props')
-    console.log(props)
-  }, [props])
-
-  useEffect(() => {
     if (props) {
       const carreras = props?.carreras
       const facultadSeleccionada = props?.facultadSeleccionado
@@ -68,17 +60,12 @@ const DialogUpdateFacultad = (props) => {
       setBase64(facultadSeleccionada?.logo || '')
       
       if (facultadSeleccionada?.color)
-        setColor({ hex: facultadSeleccionada?.color?.trim() })
-      
-      setTextFieldDecanoNombre('')
+        setColor({ hex: facultadSeleccionada?.color?.trim() })            
 
       if (facultadSeleccionada?.decano_id && decanos) {
        
         const decanosFiltrados = decanos?.filter(decano => decano?.id === facultadSeleccionada?.decano_id)[0]?.nombre
-        console.log(decanosFiltrados)
-        setTextFieldDecanoNombre(decanosFiltrados?.length ? decanosFiltrados : '')
-      } else {
-        setTextFieldDecanoNombre('')
+        console.log(decanosFiltrados)        
       }
 
       if (carreras?.length) {
@@ -135,9 +122,7 @@ const DialogUpdateFacultad = (props) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               'nombre': textFieldNombre,
-              'decanoNombre': textFieldDecanoNombre,
               'color': color?.hex,            
-              'carreras': carreras?.filter(carrera => carrera?.seleccionada),
               logo: base64
             })
           }
@@ -162,11 +147,9 @@ const DialogUpdateFacultad = (props) => {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              'nombre': textFieldNombre,
-              'decanoNombre': textFieldDecanoNombre,
+              'nombre': textFieldNombre,              
               'color': color?.hex,            
-              'carreras': carreras?.filter(carrera => carrera?.seleccionada),
-              decanoFacultadId: props?.facultadSeleccionada?.decano_id,
+              'carreras': carreras?.filter(carrera => carrera?.seleccionada),              
               logo: base64
             }),
           }
@@ -220,7 +203,7 @@ const DialogUpdateFacultad = (props) => {
       >
         <div>
           {props?.modoDialogUpdateFacultad === "ADD" ? (
-            <Typography>{`AÑADIR NUEVO FACULTAD`}</Typography>
+            <Typography>{`AÑADIR NUEVA FACULTAD`}</Typography>
           ) : props?.modoDialogUpdateFacultad === "EDIT" ? (
             <Typography>EDITAR FACULTAD</Typography>
           ) : (
@@ -266,14 +249,14 @@ const DialogUpdateFacultad = (props) => {
               <InputLabel required>NOMBRE</InputLabel>
               <TextField
                 required
-                fullWidth
-                id="nombre"
-                name="nombre"
-                autoComplete="nombre"
+                fullWidth                
                 size="small"
                 value={textFieldNombre}
                 onChange={(e) => {
-                  setTextFieldNombre(e?.target?.value);
+                  const value = e?.target?.value
+                  if (value?.length <= 50) {
+                    setTextFieldNombre(e?.target?.value);
+                  }
                 }}                             
                 disabled={
                       props?.modoDialogUpdateFacultad === "DELETE"
@@ -281,27 +264,6 @@ const DialogUpdateFacultad = (props) => {
                         : false
                         
                     }
-              />
-            </Grid>
-            <Grid item xs={12} >
-              <InputLabel required>DECANO</InputLabel>
-              <TextField
-                required
-                fullWidth
-                id="decano"
-                name="decano"
-                autoComplete="decano"
-                size="small"
-                value={textFieldDecanoNombre}
-                onChange={(e) => {
-                  setTextFieldDecanoNombre(e?.target?.value);
-                }}                
-                disabled={
-                  props?.modoDialogUpdateFacultad === "DELETE"
-                    ? true
-                    : false
-                    
-                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>              
@@ -386,6 +348,8 @@ const DialogUpdateFacultad = (props) => {
                 </Grid>
               }
             </Grid> 
+            
+            
             { base64 &&
               <Grid container item xs={12} justifyContent={'center'} style={{ padding: 0, height: '30%', marginTop: 5 }}>
                 <Avatar
@@ -394,53 +358,7 @@ const DialogUpdateFacultad = (props) => {
                   alt="logo-aso"
                 />
               </Grid>
-            }
-            {/*
-            <Grid item xs={12}>
-              <InputLabel style={{ textAlign: 'center' }}>{carreras?.length > 0 ? 'CARRERAS(click en carrera para seleccionar' : 'NO HAY CARRERAS REGISTRADAS'}</InputLabel>                
-                <Grid item xs={12} >
-                {carreras?.length > 0 &&
-                  <Box sx={{
-                    display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'space-between',
-                    padding: 1, backgroundColor: '#F8F8FF', borderRadius: 5
-                  }}
-                    disabled={
-                      props?.modoDialogUpdateFacultad === "DELETE"
-                        ? true
-                        : false
-                    
-                    }
-                  >
-                    {carreras?.map((carrera, i) => {
-                      return (
-                        <Chip
-                          key={`${carrera?.id}-${i}`}
-                          label={carrera?.nombre}
-                          style={{
-                            backgroundColor: carrera?.seleccionada ? 'lightgreen' : 'lightgray'
-                          }}
-                          onClick={e => {
-                            console.log('hola')
-                            console.log(carrera)                            
-                            const carrerasModificadas = carreras?.map(c => {
-                              if (carrera?.id === c?.id) {
-                                carrera.seleccionada = !carrera?.seleccionada
-                              }
-                              return c
-                            })
-                            console.log(carrerasModificadas)
-                            setCarreras(carrerasModificadas)
-                          }}
-                          
-                        />
-                      )
-                    })}
-                  </Box>
-                }
-                </Grid>
-              
-            </Grid>    
-              */}
+            }            
             <Grid item xs={12} sm={12} style={{ display: "flex" }}>
               <Button
                 sm={12}
@@ -452,7 +370,7 @@ const DialogUpdateFacultad = (props) => {
                 }}
               >
                 {props?.modoDialogUpdateFacultad === "ADD"
-                  ? "GUARDAR"
+                  ? "GUARDAR" 
                   : props?.modoDialogUpdateFacultad === "EDIT"
                   ? "EDITAR"
                   : "ELIMINAR"}

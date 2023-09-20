@@ -160,6 +160,26 @@ const App = () => {
             element={
               cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
                 <Dashboard
+                  seccion="SeccionAutoridades"
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              ) : (
+                <Landing
+                  setSeverity={setSeverity}
+                  setMessage={setMessage}
+                  setOpenSnackBar={setOpenSnackBar}
+                />
+              )
+            }
+            path="dashboard/autoridades"
+          ></Route>
+          <Route
+            index
+            element={
+              cookies?.EMAIL && cookies?.TOKEN && sessionStorage ? (
+                <Dashboard
                   seccion="SeccionRegalos"
                   setSeverity={setSeverity}
                   setMessage={setMessage}
