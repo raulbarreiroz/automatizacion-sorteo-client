@@ -13,7 +13,6 @@ import InputLabel from "@mui/material/InputLabel";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useEffect, useState, useRef } from "react";
 import Resizer from "react-image-file-resizer";
-import { decode as base64_decode, encode as base64_encode } from 'base-64';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import Visualizador from "../Visualizador";
 
@@ -28,8 +27,7 @@ const DialogUpdateProfesor = (props) => {
   const [textFieldApellido2, setTextFieldApellido2] = useState(undefined)
   const [facultadSeleccionada, setFacultadSeleccionada] = useState(undefined)
   const [base64, setBase64] = useState(undefined)
-  const [openVisualizador, setOpenVisualizador] = useState(false)
-  const [autoridades, setAutoridades] = useState(undefined)
+  const [openVisualizador, setOpenVisualizador] = useState(false)  
 
   useEffect(() => {    
     if (props?.mostrarDialogUpdateProfesor) { 

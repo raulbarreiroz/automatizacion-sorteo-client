@@ -14,11 +14,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DialogUpdateAutoridad from "../dialog/DialogUpdateAutoridad";
 import Carga from "../Carga";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Tooltip from '@mui/material/Tooltip';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Tooltip from "@mui/material/Tooltip";
 import Visualizador from "../Visualizador";
-import Select from "@mui/material/Select"
-import MenuItem from "@mui/material/MenuItem"
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const SeccionAutoridades = (props) => {
   const [cargando, setCargando] = useState(false);
@@ -27,47 +27,96 @@ const SeccionAutoridades = (props) => {
     useState(undefined);
   const [hoveredCell, setHoveredCell] = useState(undefined);
   const [mostrarDialogUpdateAutoridad, setMostrarDialogUpdateAutoridad] =
-    useState(false);    
+    useState(false);
   const [autoridadSeleccionada, setAutoridadSeleccionada] = useState(undefined);
-  const [autoridades, setAutoridades] = useState(undefined);  
-  const [autoridadesFiltradas, setAutoridadesFiltradas] = useState(undefined)
+  const [autoridades, setAutoridades] = useState(undefined);
+  const [autoridadesFiltradas, setAutoridadesFiltradas] = useState(undefined);
   const [facultades, setFacultades] = useState(undefined);
-  const [carreras, setCarreras] = useState(undefined)    
-  const [openVisualizador, setOpenVisualizador] = useState(false)
-  const [imagenVisualizador, setImagenVisualizador] = useState(undefined)  
-  const [tipoDeAutoridadSeleccionada, setTipoDeAutoridadSeleccionada] = useState(undefined)
+  const [carreras, setCarreras] = useState(undefined);
+  const [openVisualizador, setOpenVisualizador] = useState(false);
+  const [imagenVisualizador, setImagenVisualizador] = useState(undefined);
+  const [tipoDeAutoridadSeleccionada, setTipoDeAutoridadSeleccionada] =
+    useState(undefined);
   const getAutoridades = useCallback(async () => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_SERVERURL}/autoridades`
-      );            
+      );
       const autoridades = await response.json();
       if (autoridades?.length) {
         setAutoridades(autoridades);
-        setTipoDeAutoridadSeleccionada(autoridades[0]?.id)
+        setTipoDeAutoridadSeleccionada(autoridades[0]?.id);
       } else {
         setAutoridades([]);
-        setTipoDeAutoridadSeleccionada('')
+        setTipoDeAutoridadSeleccionada("");
       }
       setCargando(false);
     } catch (err) {
       console.log(err);
       setAutoridades([]);
-      setTipoDeAutoridadSeleccionada('')
+      setTipoDeAutoridadSeleccionada("");
       setCargando(false);
-    }    
+    }
   }, []);
-  
-  useEffect(() => {    
-    setCargando(true);
-    getAutoridades()    
-  }, [getAutoridades]);
+  const getCarreras = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/carreras`
+      );
+      const carreras = await response.json();
+      if (carreras?.length) {
+        setCarreras(carreras);
+      } else {
+        setCarreras([]);
+      }
+      setCargando(false);
+    } catch (err) {
+      console.log(err);
+      setCarreras([]);
+    }
+  }, []);
+  const getFacultades = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVERURL}/facultades`
+      );
+      const facultades = await response.json();
+      if (facultades?.length) {
+        setFacultades(facultades);
+      } else {
+        setFacultades(facultades);
+      }
+    } catch (err) {
+      console.log(err);
+      setFacultades([]);
+    }
+  }, []);
 
   useEffect(() => {
-    if (tipoDeAutoridadSeleccionada && autoridades?.length) {      
-      setAutoridadesFiltradas(autoridades?.filter(a => a?.id === tipoDeAutoridadSeleccionada)[0]?.detalles)
+    setCargando(true);
+    getFacultades();
+    getCarreras();
+    getAutoridades();
+  }, [getAutoridades, getFacultades, getCarreras]);
+
+  useEffect(() => {
+    if (tipoDeAutoridadSeleccionada && autoridades?.length) {
+      setAutoridadesFiltradas(
+        autoridades?.filter((a) => a?.id === tipoDeAutoridadSeleccionada)[0]
+          ?.detalles
+      );
     }
-  }, [tipoDeAutoridadSeleccionada, autoridades])
+  }, [tipoDeAutoridadSeleccionada, autoridades]);
+
+  useEffect(() => {
+    console.log("autoridades: ");
+    console.log(autoridades);
+  }, [autoridades]);
+
+  useEffect(() => {
+    console.log("autoridadesFiltradas");
+    console.log(autoridadesFiltradas);
+  }, [autoridadesFiltradas]);
 
   return (
     <>
@@ -79,60 +128,60 @@ const SeccionAutoridades = (props) => {
         }}
       >
         <Grid
-          width={'100%'}
+          width={"100%"}
           ref={gridBotones}
-          container justifyContent={"flex-start"}          
+          container
+          justifyContent={"flex-start"}
           columnGap={1}
-        >         
-          <Grid item xs={12} sm={7} >
-            {autoridades?.length > 0 ?              
-                <Select
-                  sx={{
-                    p: 0,
-                    m: 0,
-                    mb: 2,
-                  }}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  id="cabecera-select"
-                  value={tipoDeAutoridadSeleccionada}
-                  onChange={e => {
-                    console.log(e?.target?.value)
-                    setTipoDeAutoridadSeleccionada(e?.target?.value)
-                  }}
-                >
-                  {
-                    autoridades?.length &&
-                    autoridades?.map((autoridad, i) => {
-                      return (
-                        <MenuItem key={i} value={autoridad?.id}>
-                          {autoridad?.nombre}
-                        </MenuItem>
-                      );
-                    })
-                  }
-                </Select>
-               : ''
-            }
+        >
+          <Grid item xs={12} sm={5.5}>
+            {autoridades?.length > 0 ? (
+              <Select
+                sx={{
+                  p: 0,
+                  m: 0,
+                  mb: 2,
+                }}
+                fullWidth
+                variant="outlined"
+                size="small"
+                id="cabecera-select"
+                value={tipoDeAutoridadSeleccionada}
+                onChange={(e) => {
+                  console.log(e?.target?.value);
+                  setTipoDeAutoridadSeleccionada(e?.target?.value);
+                }}
+              >
+                {autoridades?.length &&
+                  autoridades?.map((autoridad, i) => {
+                    return (
+                      <MenuItem key={i} value={autoridad?.id}>
+                        {autoridad?.nombre}
+                      </MenuItem>
+                    );
+                  })}
+              </Select>
+            ) : (
+              ""
+            )}
           </Grid>
-          <Grid  item xs={12} sm={4} md={2}>
+          <Grid item xs={12} sm={5.5} lg={2}>
             <Button
               variant="outlined"
               startIcon={<SchoolIcon />}
               endIcon={<AddIcon />}
               sx={{ mb: 2 }}
               size="large"
+              fullWidth
               onClick={(e) => {
                 setMostrarDialogUpdateAutoridad(true);
                 setModoDialogUpdateAutoridad("ADD");
                 setAutoridadSeleccionada(undefined);
               }}
-              fullWidth
             >
               Autoridad
             </Button>
-          </Grid>                                          
+          </Grid>
         </Grid>
 
         <Grid
@@ -140,10 +189,10 @@ const SeccionAutoridades = (props) => {
           xs={12}
           style={{
             maxHeight: `calc(100% - ${gridBotones?.current?.clientHeight}px)`,
-            overflow: autoridades?.length ? "scroll" : "hidden",
+            overflow: autoridadesFiltradas?.length > 0 ? "scroll" : "hidden",
           }}
-        >          
-          {autoridadesFiltradas?.length ? (
+        >
+          {autoridadesFiltradas?.length > 0 ? (
             <TableContainer
               component={Paper}
               style={{
@@ -160,15 +209,7 @@ const SeccionAutoridades = (props) => {
                         borderStartStartRadius: "5px",
                       }}
                     >
-                      Cédula
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Nombre completo
+                      NOMBRE
                     </TableCell>
                     <TableCell
                       style={{
@@ -185,14 +226,6 @@ const SeccionAutoridades = (props) => {
                       }}
                     >
                       Imagen
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        backgroundColor: "rgb(153, 0, 0)",
-                        color: "white",
-                      }}
-                    >
-                      Asistio
                     </TableCell>
                     <TableCell
                       style={{
@@ -216,10 +249,12 @@ const SeccionAutoridades = (props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {autoridades.map((row, i) => {
+                  {autoridadesFiltradas.map((row, i) => {
+                    console.log("iteracion");
+                    console.log(row);
                     return (
                       <TableRow
-                        key={`${row?.cedula}-${i}`}
+                        key={`${row?.nombre}-${row?.id}-${i}`}
                         sx={{
                           "&:last-child td, &:last-child th": {
                             border: 0,
@@ -239,41 +274,52 @@ const SeccionAutoridades = (props) => {
                         }}
                       >
                         <TableCell component="th" scope="row">
-                          {row.cedula}
+                          {row.nombre}
                         </TableCell>
-                        <TableCell>{`${row?.nombre1} ${row?.nombre2} ${row?.apellido1} ${row?.apellido2}`}</TableCell>
                         <TableCell>
-                          {
-                            facultades?.filter(
-                              (facultad) => facultad?.id === row?.facultad_id
-                            )[0]?.nombre
-                          }
+                          {tipoDeAutoridadSeleccionada === 1 &&
+                          facultades?.length
+                            ? facultades?.filter(
+                                (facultad) =>
+                                  facultad?.id === row?.institucion_id
+                              )[0]?.nombre
+                            : (tipoDeAutoridadSeleccionada === 2 ||
+                                tipoDeAutoridadSeleccionada === 3) &&
+                              carreras?.length &&
+                              carreras?.filter(
+                                (carrera) => carrera?.id === row?.institucion_id
+                              )[0]?.nombre}
                         </TableCell>
-                        
+
                         <TableCell>
-                          {row?.imagen ?
+                          {row?.imagen ? (
                             <img
                               src={row?.imagen}
                               alt="cargando"
                               style={{
-                                width: '5vw',
-                                height: '5vw',
-                                borderRadius: '50%',
-                                cursor: 'pointer'
-                              }}     
-                              onClick={e => {
-                                setImagenVisualizador(row?.imagen)
-                                setOpenVisualizador(true)
+                                width: "5vw",
+                                height: "5vw",
+                                borderRadius: "50%",
+                                cursor: "pointer",
                               }}
-                            /> : <>
-                              <Tooltip title="Profesor no tiene imagen asignada">
-                                <AccountCircleIcon style={{
-                                width: '5vw',
-                            height: '5vw',}} /></Tooltip></>
-                          }
-                          
+                              onClick={(e) => {
+                                setImagenVisualizador(row?.imagen);
+                                setOpenVisualizador(true);
+                              }}
+                            />
+                          ) : (
+                            <>
+                              <Tooltip title="Autoridad no tiene imagen asignada">
+                                <AccountCircleIcon
+                                  style={{
+                                    width: "5vw",
+                                    height: "5vw",
+                                  }}
+                                />
+                              </Tooltip>
+                            </>
+                          )}
                         </TableCell>
-                        <TableCell>{ row?.asistio}</TableCell>
                         <TableCell>
                           <EditIcon
                             style={{
@@ -311,7 +357,7 @@ const SeccionAutoridades = (props) => {
                 margin: "10px 0",
               }}
             >
-              No hay profesores registrados
+              No hay autoridades registrados
             </div>
           )}
         </Grid>
@@ -324,17 +370,20 @@ const SeccionAutoridades = (props) => {
         autoridadSeleccionada={autoridadSeleccionada}
         autoridades={autoridades}
         facultades={facultades}
-        setCargando={setCargando}                        
-      />      
+        carreras={carreras}
+        setCargando={setCargando}
+        tipoDeAutoridadSeleccionada={tipoDeAutoridadSeleccionada}
+        getAutoridades={getAutoridades}
+        autoridadesFiltradas={autoridadesFiltradas}
+      />
       <Carga cargando={cargando} />
-      {
-        openVisualizador &&
+      {openVisualizador && (
         <Visualizador
           imagen={imagenVisualizador}
           openVisualizador={openVisualizador}
           setOpenVisualizador={setOpenVisualizador}
         />
-      }
+      )}
     </>
   );
 };
